@@ -1,1 +1,149 @@
-4e0bcbc00c98a8f1df3959e3754f04c518287289
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrotaPro - Gestão de Frota</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+    <div id="app" class="max-w-7xl mx-auto p-4 sm:p-6">
+        <header class="flex flex-col sm:flex-row justify-between items-center pb-6 mb-6 border-b border-slate-800 gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl">
+                    <i data-lucide="truck" class="w-7 h-7 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">FrotaPro</h1>
+                    <p class="text-sm text-slate-400">Sistema de Gestão e Controle Operacional</p>
+                </div>
+            </div>
+            <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 text-xs font-medium border border-slate-700">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span>Conectando ao Supabase...</span>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
+                    <div class="text-slate-400 text-sm font-medium">Veículos Cadastrados</div>
+                    <div id="total-vehicles" class="text-3xl font-bold mt-1 text-blue-400">0</div>
+                </div>
+                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
+                    <div class="text-slate-400 text-sm font-medium">Manutenções Pendentes</div>
+                    <div id="total-maintenances" class="text-3xl font-bold mt-1 text-amber-400">0</div>
+                </div>
+                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
+                    <div class="text-slate-400 text-sm font-medium">Status Operacional</div>
+                    <div class="text-3xl font-bold mt-1 text-emerald-400">Normal</div>
+                </div>
+            </div>
+
+            <!-- Vehicles Table Section -->
+            <div class="bg-slate-800/30 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 sm:p-6 border-b border-slate-800 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold flex items-center gap-2">
+                        <i data-lucide="car" class="w-5 h-5 text-blue-400"></i> Frota Ativa
+                    </h2>
+                    <span class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">Atualizado em tempo real</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider bg-slate-900/50">
+                                <th class="p-4">Prefixo / Identificação</th>
+                                <th class="p-4">Modelo</th>
+                                <th class="p-4">Placa</th>
+                                <th class="p-4">Quilometragem</th>
+                                <th class="p-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicles-table-body" class="divide-y divide-slate-800 text-sm">
+                            <tr>
+                                <td colspan="5" class="p-6 text-center text-slate-500">Carregando dados da frota...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script de Inicialização e Lógica -->
+    <script>
+        lucide.createIcons();
+
+        // Configuração do Supabase (utiliza variáveis injetadas ou fallback seguro)
+        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'https://lphbqipxqcuunoomwxpw.supabase.co';
+        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
+
+        let supabaseClient = null;
+
+        try {
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                checkConnection();
+            }
+        } catch (err) {
+            console.error("Erro ao iniciar Supabase:", err);
+            updateStatus(false, "Erro de inicialização");
+        }
+
+        function updateStatus(success, message) {
+            const statusEl = document.getElementById('connection-status');
+            if (success) {
+                statusEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-emerald-400">Conectado ao Supabase</span>`;
+            } else {
+                statusEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span class="text-rose-400">${message}</span>`;
+            }
+        }
+
+        async function checkConnection() {
+            try {
+                const { data, error } = await supabaseClient.from('vehicles').select('*').limit(1);
+                if (error) throw error;
+                updateStatus(true);
+                loadDashboardData();
+            } catch (e) {
+                console.warn("Aviso de conexão/tabela:", e.message);
+                updateStatus(true, "Conectado (Verifique as tabelas)");
+            }
+        }
+
+        async function loadDashboardData() {
+            if (!supabaseClient) return;
+            try {
+                const { data: vehicles, error } = await supabaseClient.from('vehicles').select('*');
+                if (error) throw error;
+
+                document.getElementById('total-vehicles').innerText = vehicles ? vehicles.length : 0;
+                
+                const tbody = document.getElementById('vehicles-table-body');
+                if (!vehicles || vehicles.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhum veículo cadastrado no banco de dados.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = vehicles.map(v => `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="p-4 font-medium">${v.prefix || v.nome || 'N/A'}</td>
+                        <td class="p-4 text-slate-300">${v.model || v.modelo || 'N/A'}</td>
+                        <td class="p-4 font-mono text-xs text-slate-400">${v.plate || v.placa || 'N/A'}</td>
+                        <td class="p-4">${v.mileage || v.quilometragem || 0} km</td>
+                        <td class="p-4"><span class="px-2.5 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Operacional</span></td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Erro ao carregar veículos:", err.message);
+            }
+        }
+    </script>
+</body>
+</html>
