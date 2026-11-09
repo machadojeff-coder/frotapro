@@ -406,7 +406,45 @@
             });
         }
 
-        async function salvarVeiculo() {
+        async function async function salvarVeiculo() {
+            const placa = document.getElementById('placa').value.trim().toUpperCase();
+            const modelo = document.getElementById('modelo').value.trim();
+            if (!placa || !modelo) return mostrarMsg('A Placa e o Modelo são obrigatórios!', 'erro');
+
+            // Pega o KM atual informado
+            const kmAtualInput = parseInt(document.getElementById('km_atual').value) || 0;
+            
+            // Verifica os campos de óleo e revisão
+            const kmOleoStr = document.getElementById('km_ultimo_oleo').value;
+            const kmRevStr = document.getElementById('km_ultima_revisao').value;
+            
+            // REGRA: Se o usuário deixar em branco, o sistema assume o KM Atual como base.
+            // Se o usuário preencher com um dado real anterior (ex: trocou com 48.000 e hoje tem 50.000), o sistema respeita o dado real.
+            const kmOleoFinal = kmOleoStr !== "" ? parseInt(kmOleoStr) : kmAtualInput;
+            const kmRevFinal = kmRevStr !== "" ? parseInt(kmRevStr) : kmAtualInput;
+
+            const dados = {
+                placa,
+                prefixo: document.getElementById('prefixo').value.trim(),
+                modelo, 
+                unidade: document.getElementById('unidade').value.trim(),
+                combustivel: document.getElementById('combustivel').value,
+                status: document.getElementById('status').value,
+                local_uso: document.getElementById('local_uso').value.trim() || 'Pátio / Unidade',
+                km_atual: kmAtualInput,
+                km_ultimo_oleo: kmOleoFinal,
+                km_ultima_revisao: kmRevFinal
+            };
+
+            const { error } = await supabaseClient.from('veiculos').upsert([dados]);
+            if (error) {
+                mostrarMsg('Erro ao salvar viatura: ' + error.message, 'erro');
+            } else {
+                mostrarMsg('Viatura salva com sucesso!');
+                limparFormularioVeiculo();
+                carregarTudo();
+            }
+        }() {
             const placa = document.getElementById('placa').value.trim().toUpperCase();
             const modelo = document.getElementById('modelo').value.trim();
             if (!placa || !modelo) return mostrarMsg('Placa e Modelo são obrigatórios!', 'erro');
