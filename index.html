@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrotaPro - Gestão Operacional Integrada</title>
-    <script src="https://lphbqipxqcuunoomwxpw.supabase.co"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -150,8 +150,8 @@
                     <select id="combustivel"><option>Diesel</option><option>Flex</option><option>Gasolina</option></select>
                 </div>
                 <div><label>KM Atual</label><input type="number" id="km_atual" placeholder="45000"></div>
-                <div><label>KM Última Troca de Óleo</label><input type="number" id="km_ultimo_oleo" placeholder="Opcional"></div>
-                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="Opcional"></div>
+                <div><label>KM Última Troca de Óleo</label><input type="number" id="km_ultimo_oleo" placeholder="40000"></div>
+                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="40000"></div>
                 <div>
                     <label>Status Operacional</label>
                     <select id="status"><option>Disponível</option><option>Em Rota</option><option>Manutenção</option></select>
@@ -365,7 +365,7 @@
                     <td>${(v.km_atual||0)} km</td>
                     <td>
                         <button class="btn btn-action" onclick="prepararEdicao('${v.placa}', '${v.prefixo||''}', '${v.modelo}', '${v.unidade||''}', '${v.combustivel||'Flex'}', '${v.status}', ${v.km_atual||0}, ${v.km_ultimo_oleo||0}, ${v.km_ultima_revisao||0}, '${v.local_uso||''}')">Editar</button>
-                        <button class="btn btn-danger btn-action" onclick="deletarVeiculo('${v.placa}')">X</button>
+                        <button class="btn btn-danger btn-action" onclick="deletarVeiculo('${v.placa}')">Excluir</button>
                     </td>
                 </tr>`;
             });
@@ -376,15 +376,6 @@
             const modelo = document.getElementById('modelo').value.trim();
             if (!placa || !modelo) return mostrarMsg('A Placa e o Modelo são obrigatórios!', 'erro');
 
-            const kmAtualStr = document.getElementById('km_atual').value;
-            const kmOleoStr = document.getElementById('km_ultimo_oleo').value;
-            const kmRevStr = document.getElementById('km_ultima_revisao').value;
-
-            const km_atual = kmAtualStr ? parseInt(kmAtualStr) : 0;
-            // Se o campo estiver vazio, pega o valor do km_atual
-            const km_ultimo_oleo = kmOleoStr ? parseInt(kmOleoStr) : km_atual;
-            const km_ultima_revisao = kmRevStr ? parseInt(kmRevStr) : km_atual;
-
             const dados = {
                 placa,
                 prefixo: document.getElementById('prefixo').value.trim(),
@@ -393,9 +384,9 @@
                 combustivel: document.getElementById('combustivel').value,
                 status: document.getElementById('status').value,
                 local_uso: document.getElementById('local_uso').value.trim() || 'Pátio / Unidade',
-                km_atual,
-                km_ultimo_oleo,
-                km_ultima_revisao
+                km_atual: parseInt(document.getElementById('km_atual').value) || 0,
+                km_ultimo_oleo: parseInt(document.getElementById('km_ultimo_oleo').value) || 0,
+                km_ultima_revisao: parseInt(document.getElementById('km_ultima_revisao').value) || 0
             };
 
             const { error } = await supabaseClient.from('veiculos').upsert([dados]);
@@ -410,7 +401,7 @@
 
         function prepararEdicao(placa, prefixo, modelo, unidade, combustivel, status, km, oleo, rev, local) {
             document.getElementById('placa').value = placa;
-            document.getElementById('placa').disabled = true;
+            document.getElementById('placa').disabled = true; // Bloqueia a placa para não duplicar no Upsert
             document.getElementById('prefixo').value = prefixo;
             document.getElementById('modelo').value = modelo;
             document.getElementById('unidade').value = unidade;
@@ -426,7 +417,7 @@
 
         function limparFormularioVeiculo() {
             document.getElementById('placa').value = '';
-            document.getElementById('placa').disabled = false;
+            document.getElementById('placa').disabled = false; // Restaura a caixa de placa
             document.getElementById('prefixo').value = '';
             document.getElementById('modelo').value = '';
             document.getElementById('unidade').value = '';
@@ -439,8 +430,13 @@
         async function deletarVeiculo(placa) {
             if (confirm(`ATENÇÃO: Deseja realmente excluir a viatura ${placa}?`)) {
                 const { error } = await supabaseClient.from('veiculos').delete().eq('placa', placa);
-                if (error) mostrarMsg('Erro ao excluir. O banco não permite apagar viaturas com histórico.', 'erro');
-                else { mostrarMsg(`Viatura ${placa} excluída com sucesso!`); limparFormularioVeiculo(); carregarTudo(); }
+                if (error) {
+                    mostrarMsg('Não foi possível excluir: O Banco de Dados travou por segurança pois esta viatura possui histórico gravado. (Verifique o Passo 1 do SQL).', 'erro');
+                } else {
+                    mostrarMsg(`Viatura ${placa} excluída com sucesso!`);
+                    limparFormularioVeiculo();
+                    carregarTudo();
+                }
             }
         }
 
