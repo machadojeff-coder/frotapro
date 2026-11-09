@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrotaPro - Gestão Operacional</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e3a8a;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
+        }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: var(--text); }
+        .dashboard-container { max-width: 1500px; margin: 0 auto; }
+        
+        /* Cabeçalho */
+        .header-panel { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 22px 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .header-panel h1 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 12px; }
+        .header-panel p { margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .kpi-card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); display: flex; flex-direction: column; }
+        .kpi-card.success { border-left-color: var(--success); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        /* Abas */
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 6px; border-radius: 10px; width: fit-content; flex-wrap: wrap; }
+        .tab-btn { background: transparent; color: #64748b; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s; }
+        .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .tab-content { display: none; background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-content.active { display: block; }
+
+        /* Formulários e Blocos */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; align-items: end; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
+        .filters-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        
+        label { font-size: 11px; font-weight: 700; display: block; margin-bottom: 6px; color: #475569; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; box-sizing: border-box; background: white; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        
+        button.btn { padding: 10px 18px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; color: white; background: var(--accent); }
+        button.btn:hover { background: #2563eb; }
+        button.btn-success { background: var(--success); }
+        button.btn-success:hover { background: #059669; }
+        button.btn-danger { background: var(--danger); }
+        button.btn-danger:hover { background: #dc2626; }
+        button.btn-warning { background: var(--warning); color: #fff; }
+        button.btn-secondary { background: #64748b; }
+        button.btn-secondary:hover { background: #475569; }
+
+        /* Tabela Lote */
+        .table-lote { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .table-lote th, .table-lote td { padding: 8px; border: 1px solid var(--border); }
+        .table-lote th { background: #f1f5f9; font-size: 11px; text-transform: uppercase; }
+
+        /* Tabelas Gerais */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+        th { background-color: #f1f5f9; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        tr:hover { background-color: #f8fafc; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; text-align: center; }
+        .badge-disponivel { background-color: #d1fae5; color: #065f46; }
+        .badge-em-rota { background-color: #dbeafe; color: #1e40af; }
+        .badge-manutencao { background-color: #fee2e2; color: #991b1b; }
+        
+        .maint-ok { background-color: #d1fae5; color: #065f46; }
+        .maint-warning { background-color: #fef3c7; color: #92400e; }
+        .maint-alert { background-color: #fee2e2; color: #991b1b; font-weight: bold; }
+
+        .msg-box { padding: 12px 18px; margin-bottom: 20px; border-radius: 8px; font-weight: 600; display: none; font-size: 13px; }
+        .msg-success { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .msg-error { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .actions { display: flex; gap: 6px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Cabeçalho -->
+        <div class="header-panel">
+            <div>
+                <h1>🛡️ FrotaPro - Gestão Operacional</h1>
+                <p>Controle avançado de frotas, patrimônio, quilometragem e vistorias</p>
+            </div>
+            <div id="relogio-atual" style="font-size: 13px; color: #cbd5e1; text-align: right;"></div>
+        </div>
+
+        <div id="feedback-msg" class="msg-box"></div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <span class="kpi-title">Total de Veículos</span>
+                <span class="kpi-value" id="kpi-total">0</span>
+            </div>
+            <div class="kpi-card success">
+                <span class="kpi-title">Disponíveis</span>
+                <span class="kpi-value" id="kpi-disponiveis">0</span>
+            </div>
+            <div class="kpi-card warning">
+                <span class="kpi-title">Em Rota</span>
+                <span class="kpi-value" id="kpi-em-rota">0</span>
+            </div>
+            <div class="kpi-card danger">
+                <span class="kpi-title">Manutenção / Alertas</span>
+                <span class="kpi-value" id="kpi-manutencao">0</span>
+            </div>
+        </div>
+
+        <!-- Menu de Abas -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="mudarAba('frota')">🚗 Frota & Veículos</button>
+            <button class="tab-btn" onclick="mudarAba('lote')">📥 Cadastro em Lote</button>
+            <button class="tab-btn" onclick="mudarAba('checklist')">📋 Checklist Pré-Viagem</button>
+            <button class="tab-btn" onclick="mudarAba('historico')">🔧 Manutenções</button>
+        </div>
+
+        <!-- ABA 1: FROTA -->
+        <div id="aba-frota" class="tab-content active">
+            <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 8px;">Cadastro e Monitoramento Individual</h3>
+            <div class="form-grid">
+                <input type="hidden" id="edit-id" value="">
+                <div><label>Placa</label><input type="text" id="placa" placeholder="ABC-1234"></div>
+                <div><label>Prefixo da Viatura</label><input type="text" id="prefixo" placeholder="Ex: V-2301"></div>
+                <div><label>Modelo</label><input type="text" id="modelo" placeholder="Ex: Toyota Hilux"></div>
+                <div><label>Unidade / Setor</label><input type="text" id="unidade" placeholder="Ex: 23º BPM - P4"></div>
+                <div><label>Nº Patrimônio</label><input type="text" id="patrimonio" placeholder="Ex: PAT-98213"></div>
+                <div>
+                    <label>Combustível</label>
+                    <select id="combustivel">
+                        <option value="Diesel">Diesel</option>
+                        <option value="Flex">Flex</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Etanol">Etanol</option>
+                        <option value="Híbrido/Elétrico">Híbrido / Elétrico</option>
+                    </select>
+                </div>
+                <div><label>Ano Fabricação</label><input type="number" id="ano" placeholder="2024"></div>
+                <div><label>Motorista Resp.</label><input type="text" id="motorista" placeholder="Nome"></div>
+                <div><label>KM Atual</label><input type="number" id="km_atual" placeholder="45000"></div>
+                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="40000"></div>
+                <div><label>Intervalo Revisão (KM)</label><input type="number" id="intervalo_revisao" value="10000"></div>
+                <div>
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="Disponível">Disponível</option>
+                        <option value="Em Rota">Em Rota</option>
+                        <option value="Manutenção">Manutenção</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2;"><button id="btn-salvar" onclick="salvarVeiculo()" class="btn btn-success" style="width:100%;">Cadastrar Veículo</button></div>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" id="filtra-busca" placeholder="🔍 Pesquisar por placa, prefixo, modelo, unidade ou patrimônio..." onkeyup="filtrarVeiculos()" style="flex: 2;">
+                <select id="filtra-status" onchange="filtrarVeiculos()" style="flex: 1;">
+                    <option value="">Todos os Status</option>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Rota">Em Rota</option>
+                    <option value="Manutenção">Manutenção</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table id="tabela-frota">
+                    <thead>
+                        <tr>
+                            <th>Prefixo / Placa / Modelo</th>
+                            <th>Unidade / Patrimônio</th>
+                            <th>Combustível / Ano</th>
+                            <th>Motorista</th>
+                            <th>Status</th>
+                            <th>Quilometragem / Revisão</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 2: CADASTRO EM LOTE -->
+        <div id="aba-lote" class="tab-content">
+            <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 8px;">Cadastro Simultâneo de Vários Veículos</h3>
+            <p style="font-size: 13px; color: #64748b;">Adicione quantas linhas precisar preenchendo os dados das viaturas e clique em "Salvar Todos em Lote" no final.</p>
+            
+            <div class="table-responsive">
+                <table class="table-lote" id="tabela-lote-inputs">
+                    <thead>
+                        <tr>
+                            <th>Placa *</th>
+                            <th>Prefixo</th>
+                            <th>Modelo *</th>
+                            <th>Unidade</th>
+                            <th>Patrimônio</th>
+                            <th>Combustível</th>
+                            <th>Ano</th>
+                            <th>KM Atual</th>
+                            <th>Remover</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lote-tbody">
+                        <!-- Linhas geradas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="adicionarLinhaLote()">➕ Adicionar Outra Linha</button>
+                <button class="btn btn-success" onclick="salvarLoteDeVeiculos()">💾 Salvar Todos em Lote</button>
+            </div>
+        </div>
+
+        <!-- ABA 3: CHECKLIST -->
+        <div id="aba-checklist" class="tab-content">
+            <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 8px;">Inspeção e Vistoria Pré-Viagem</h3>
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div><label>Selecione o Veículo</label><select id="chk-placa"></select></div>
+                <div><label>Condutor</label><input type="text" id="chk-motorista" placeholder="Nome do motorista"></div>
+                <div><label>Pneus</label><select id="chk-pneus"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div><label>Óleo e Fluidos</label><select id="chk-oleo"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div><label>Sinalização / Luzes</label><select id="chk-sinalizacao"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div><label>Freios</label><select id="chk-freios"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div style="grid-column: span 2;"><label>Observações / Avarias</label><textarea id="chk-obs" rows="2" placeholder="Detalhes ou avarias..."></textarea></div>
+                <div><button onclick="salvarChecklist()" class="btn btn-success" style="width:100%;">Registrar Checklist</button></div>
+            </div>
+
+            <h4 style="color:var(--primary); margin-top:25px;">Últimos Checklists Realizados</h4>
+            <div class="table-responsive">
+                <table id="tabela-checklists">
+                    <thead><tr><th>Data/Hora</th><th>Placa</th><th>Motorista</th><th>Condições</th><th>Observações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 4: HISTÓRICO DE MANUTENÇÃO -->
+        <div id="aba-historico" class="tab-content">
+            <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 8px;">Registro de Intervenções e Manutenções</h3>
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div><label>Selecione o Veículo</label><select id="man-placa"></select></div>
+                <div><label>Tipo de Intervenção</label><select id="man-tipo"><option value="Preventiva">Preventiva (Revisão)</option><option value="Corretiva">Corretiva (Reparo)</option></select></div>
+                <div><label>KM da Execução</label><input type="number" id="man-km" placeholder="Ex: 40000"></div>
+                <div style="grid-column: span 2;"><label>Descrição do Serviço</label><input type="text" id="man-desc" placeholder="Ex: Troca de óleo, filtros, pastilhas..."></div>
+                <div><button onclick="salvarManutencao()" class="btn btn-warning" style="width:100%;">Registrar Serviço</button></div>
+            </div>
+
+            <h4 style="color:var(--primary); margin-top:25px;">Histórico Geral de Manutenções</h4>
+            <div class="table-responsive">
+                <table id="tabela-historico-manutencao">
+                    <thead><tr><th>Data</th><th>Placa</th><th>Tipo</th><th>KM</th><th>Descrição</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://lphbqipxqcuunoomwxpw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let listaVeiculosCache = [];
+
+        document.getElementById('relogio-atual').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        function mostrarMensagem(texto, tipo = 'sucesso') {
+            const box = document.getElementById('feedback-msg');
+            box.innerText = texto;
+            box.className = `msg-box ${tipo === 'sucesso' ? 'msg-success' : 'msg-error'}`;
+            box.style.display = 'block';
+            setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            if (aba === 'frota') {
+                document.getElementById('aba-frota').classList.add('active');
+                event.target.classList.add('active');
+            } else if (aba === 'lote') {
+                document.getElementById('aba-lote').classList.add('active');
+                event.target.classList.add('active');
+                if(document.getElementById('lote-tbody').children.length === 0) {
+                    adicionarLinhaLote();
+                    adicionarLinhaLote();
+                    adicionarLinhaLote();
+                }
+            } else if (aba === 'checklist') {
+                document.getElementById('aba-checklist').classList.add('active');
+                event.target.classList.add('active');
+                carregarSelectsPlacas();
+                carregarChecklists();
+            } else if (aba === 'historico') {
+                document.getElementById('aba-historico').classList.add('active');
+                event.target.classList.add('active');
+                carregarSelectsPlacas();
+                carregarHistoricoManutencoes();
+            }
+        }
+
+        // Funções de Cadastro em Lote
+        function adicionarLinhaLote() {
+            const tbody = document.getElementById('lote-tbody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" placeholder="ABC-1234" class="lote-placa"></td>
+                <td><input type="text" placeholder="V-01" class="lote-prefixo"></td>
+                <td><input type="text" placeholder="Hilux" class="lote-modelo"></td>
+                <td><input type="text" placeholder="23º BPM" class="lote-unidade"></td>
+                <td><input type="text" placeholder="PAT-000" class="lote-patrimonio"></td>
+                <td>
+                    <select class="lote-combustivel">
+                        <option value="Diesel">Diesel</option>
+                        <option value="Flex">Flex</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Etanol">Etanol</option>
+                        <option value="Híbrido/Elétrico">Híbrido</option>
+                    </select>
+                </td>
+                <td><input type="number" placeholder="2024" class="lote-ano" style="width: 70px;"></td>
+                <td><input type="number" placeholder="0" class="lote-km" style="width: 90px;"></td>
+                <td><button class="btn btn-danger" style="padding: 6px 10px;" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        async function salvarLoteDeVeiculos() {
+            const linhas = document.querySelectorAll('#lote-tbody tr');
+            const novosVeiculos = [];
+
+            linhas.forEach(tr => {
+                const placa = tr.querySelector('.lote-placa').value.trim().toUpperCase();
+                const prefixo = tr.querySelector('.lote-prefixo').value.trim();
+                const modelo = tr.querySelector('.lote-modelo').value.trim();
+                const unidade = tr.querySelector('.lote-unidade').value.trim();
+                const patrimonio = tr.querySelector('.lote-patrimonio').value.trim();
+                const combustivel = tr.querySelector('.lote-combustivel').value;
+                const ano = parseInt(tr.querySelector('.lote-ano').value) || null;
+                const km_atual = parseInt(tr.querySelector('.lote-km').value) || 0;
+
+                if (placa && modelo) {
+                    novosVeiculos.push({
+                        placa, prefixo, modelo, unidade, patrimonio, combustivel, ano, km_atual,
+                        status: 'Disponível', km_ultima_revisao: km_atual, intervalo_revisao: 10000
+                    });
+                }
+            });
+
+            if (novosVeiculos.length === 0) {
+                mostrarMensagem('Preencha pelo menos a placa e o modelo de um veículo!', 'erro');
+                return;
+            }
+
+            const { error } = await supabaseClient.from('veiculos').upsert(novosVeiculos);
+            if (error) {
+                mostrarMensagem('Erro ao salvar lote: ' + error.message, 'erro');
+            } else {
+                mostrarMensagem(`${novosVeiculos.length} veículos cadastrados/atualizados com sucesso!`);
+                document.getElementById('lote-tbody').innerHTML = '';
+                adicionarLinhaLote();
+                carregarVeiculos();
+                mudarAba('frota');
+            }
+        }
+
+        async function carregarVeiculos() {
+            const { data, error } = await supabaseClient.from('veiculos').select('*').order('placa', { ascending: true });
+            if (error) { mostrarMensagem('Erro ao carregar veículos: ' + error.message, 'erro'); return; }
+            listaVeiculosCache = data;
+            atualizarKPIs(data);
+            renderizarTabela(data);
+            carregarSelectsPlacas();
+        }
+
+        function atualizarKPIs(dados) {
+            const total = dados.length;
+            const disponiveis = dados.filter(v => v.status === 'Disponível').length;
+            const emRota = dados.filter(v => v.status === 'Em Rota').length;
+            
+            let manutencaoAlertas = dados.filter(v => {
+                const kmA = v.km_atual || 0;
+                const kmU = v.km_ultima_revisao || 0;
+                const inter = v.intervalo_revisao || 10000;
+                return v.status === 'Manutenção' || kmA >= (kmU + inter);
+            }).length;
+
+            document.getElementById('kpi-total').innerText = total;
+            document.getElementById('kpi-disponiveis').innerText = disponiveis;
+            document.getElementById('kpi-em-rota').innerText = emRota;
+            document.getElementById('kpi-manutencao').innerText = manutencaoAlertas;
+        }
+
+        function renderizarTabela(dados) {
+            const tbody = document.querySelector('#tabela-frota tbody');
+            tbody.innerHTML = '';
+            if (dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b;">Nenhum veículo cadastrado.</td></tr>';
+                return;
+            }
+
+            dados.forEach(v => {
+                let badgeClass = v.status === 'Em Rota' ? 'badge-em-rota' : (v.status === 'Manutenção' ? 'badge-manutencao' : 'badge-disponivel');
+                const kmAtual = v.km_atual || 0;
+                const kmUltima = v.km_ultima_revisao || 0;
+                const intervalo = v.intervalo_revisao || 10000;
+                const proximaRevisao = kmUltima + intervalo;
+                const kmRestantes = proximaRevisao - kmAtual;
+
+                let maintBadge = kmAtual >= proximaRevisao ? 
+                    `<span class="badge maint-alert">VENCIDA (${Math.abs(kmRestantes)} km)</span>` : 
+                    (kmRestantes <= 1000 ? `<span class="badge maint-warning">Próxima (${kmRestantes} km)</span>` : `<span class="badge maint-ok">Em Dia (${kmRestantes} km)</span>`);
+
+                const prefixoStr = v.prefixo ? `<strong>[${v.prefixo}]</strong> ` : '';
+                const patrimonioStr = v.patrimonio ? `<br><small style="color: #64748b;">Pat: ${v.patrimonio}</small>` : '';
+                const combAno = `${v.combustivel || '-'} (${v.ano || 'N/D'})`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${prefixoStr}<strong>${v.placa}</strong><br><small style="color: #64748b;">${v.modelo}</small></td>
+                    <td>${v.unidade || '-'}${patrimonioStr}</td>
+                    <td>${combAno}</td>
+                    <td>${v.motorista || '-'}</td>
+                    <td><span class="badge ${badgeClass}">${v.status || 'Disponível'}</span></td>
+                    <td>${kmAtual.toLocaleString('pt-BR')} km<br>${maintBadge}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn" style="padding: 6px 12px; font-size:12px;" onclick="prepararEdicao('${v.placa}', '${v.prefixo||''}', '${v.modelo}', '${v.unidade||''}', '${v.patrimonio||''}', '${v.combustivel||'Flex'}', '${v.ano||''}', '${v.motorista || ''}', '${v.status || 'Disponível'}', ${kmAtual}, ${kmUltima}, ${intervalo})">Editar</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size:12px;" onclick="deletarVeiculo('${v.placa}')">Excluir</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function carregarSelectsPlacas() {
+            const selectChk = document.getElementById('chk-placa');
+            const selectMan = document.getElementById('man-placa');
+            if(!selectChk || !selectMan) return;
+            selectChk.innerHTML = ''; selectMan.innerHTML = '';
+            listaVeiculosCache.forEach(v => {
+                const labelPref = v.prefixo ? `[${v.prefixo}] ` : '';
+                const opt = `<option value="${v.placa}">${labelPref}${v.placa} - ${v.modelo}</option>`;
+                selectChk.innerHTML += opt; selectMan.innerHTML += opt;
+            });
+        }
+
+        function filtrarVeiculos() {
+            const termo = document.getElementById('filtra-busca').value.toLowerCase();
+            const statusFiltro = document.getElementById('filtra-status').value;
+            const filtrados = listaVeiculosCache.filter(v => {
+                const matchTexto = (v.placa && v.placa.toLowerCase().includes(termo)) || 
+                                   (v.prefixo && v.prefixo.toLowerCase().includes(termo)) || 
+                                   (v.modelo && v.modelo.toLowerCase().includes(termo)) || 
+                                   (v.unidade && v.unidade.toLowerCase().includes(termo)) || 
+                                   (v.patrimonio && v.patrimonio.toLowerCase().includes(termo)) || 
+                                   (v.motorista && v.motorista.toLowerCase().includes(termo));
+                const matchStatus = statusFiltro === '' || v.status === statusFiltro;
+                return matchTexto && matchStatus;
+            });
+            renderizarTabela(filtrados);
+        }
+
+        async function salvarVeiculo() {
+            const placa = document.getElementById('placa').value.trim().toUpperCase();
+            const prefixo = document.getElementById('prefixo').value.trim();
+            const modelo = document.getElementById('modelo').value.trim();
+            const unidade = document.getElementById('unidade').value.trim();
+            const patrimonio = document.getElementById('patrimonio').value.trim();
+            const combustivel = document.getElementById('combustivel').value;
+            const ano = parseInt(document.getElementById('ano').value) || null;
+            const motorista = document.getElementById('motorista').value.trim();
+            const status = document.getElementById('status').value;
+            const km_atual = parseInt(document.getElementById('km_atual').value) || 0;
+            const km_ultima_revisao = parseInt(document.getElementById('km_ultima_revisao').value) || 0;
+            const intervalo_revisao = parseInt(document.getElementById('intervalo_revisao').value) || 10000;
+            const editId = document.getElementById('edit-id').value;
+
+            if (!placa || !modelo) { mostrarMensagem('Preencha placa e modelo!', 'erro'); return; }
+
+            const dadosVeiculo = { placa, prefixo, modelo, unidade, patrimonio, combustivel, ano, motorista, status, km_atual, km_ultima_revisao, intervalo_revisao };
+
+            if (editId) {
+                const { error } = await supabaseClient.from('veiculos').update(dadosVeiculo).eq('placa', placa);
+                if (error) mostrarMensagem('Erro: ' + error.message, 'erro'); else { mostrarMensagem('Veículo atualizado com sucesso!'); limparFormulario(); carregarVeiculos(); }
+            } else {
+                const { error } = await supabaseClient.from('veiculos').insert([dadosVeiculo]);
+                if (error) mostrarMensagem('Erro: ' + error.message, 'erro'); else { mostrarMensagem('Veículo cadastrado com sucesso!'); limparFormulario(); carregarVeiculos(); }
+            }
+        }
+
+        function prepararEdicao(placa, prefixo, modelo, unidade, patrimonio, combustivel, ano, motorista, status, km_atual, km_ultima_revisao, intervalo_revisao) {
+            document.getElementById('placa').value = placa;
+            document.getElementById('placa').disabled = true;
+            document.getElementById('prefixo').value = prefixo;
+            document.getElementById('modelo').value = modelo;
+            document.getElementById('unidade').value = unidade;
+            document.getElementById('patrimonio').value = patrimonio;
+            document.getElementById('combustivel').value = combustivel;
+            document.getElementById('ano').value = ano;
+            document.getElementById('motorista').value = motorista;
+            document.getElementById('status').value = status;
+            document.getElementById('km_atual').value = km_atual;
+            document.getElementById('km_ultima_revisao').value = km_ultima_revisao;
+            document.getElementById('intervalo_revisao').value = intervalo_revisao;
+            document.getElementById('edit-id').value = placa;
+            document.getElementById('btn-salvar').innerText = 'Salvar Alterações';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function limparFormulario() {
+            document.getElementById('placa').value = '';
+            document.getElementById('placa').disabled = false;
+            document.getElementById('prefixo').value = '';
+            document.getElementById('modelo').value = '';
+            document.getElementById('unidade').value = '';
+            document.getElementById('patrimonio').value = '';
+            document.getElementById('combustivel').value = 'Diesel';
+            document.getElementById('ano').value = '';
+            document.getElementById('motorista').value = '';
+            document.getElementById('status').value = 'Disponível';
+            document.getElementById('km_atual').value = '';
+            document.getElementById('km_ultima_revisao').value = '';
+            document.getElementById('intervalo_revisao').value = '10000';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('btn-salvar').innerText = 'Cadastrar Veículo';
+        }
+
+        async function deletarVeiculo(placa) {
+            if (confirm(`Deseja excluir o veículo ${placa}?`)) {
+                const { error } = await supabaseClient.from('veiculos').delete().eq('placa', placa);
+                if (error) mostrarMensagem('Erro: ' + error.message, 'erro'); else { mostrarMensagem('Veículo excluído!'); carregarVeiculos(); }
+            }
+        }
+
+        async function salvarChecklist() {
+            const placa = document.getElementById('chk-placa').value;
+            const motorista = document.getElementById('chk-motorista').value.trim();
+            const pneus = document.getElementById('chk-pneus').value === 'true';
+            const oleo_fluidos = document.getElementById('chk-oleo').value === 'true';
+            const sinalizacao = document.getElementById('chk-sinalizacao').value === 'true';
+            const freios = document.getElementById('chk-freios').value === 'true';
+            const observacoes = document.getElementById('chk-obs').value.trim();
+
+            if (!motorista) { mostrarMensagem('Informe o motorista!', 'erro'); return; }
+
+            const { error } = await supabaseClient.from('checklists_viagem').insert([{ placa, motorista, pneus, oleo_fluidos, sinalizacao, freios, observacoes }]);
+            if (error) mostrarMensagem('Erro: ' + error.message, 'erro'); else { mostrarMensagem('Checklist salvo com sucesso!'); document.getElementById('chk-obs').value = ''; carregarChecklists(); }
+        }
+
+        async function carregarChecklists() {
+            const { data, error } = await supabaseClient.from('checklists_viagem').select('*').order('data_checklist', { ascending: false }).limit(20);
+            if (error) return;
+            const tbody = document.querySelector('#tabela-checklists tbody');
+            tbody.innerHTML = '';
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Nenhum checklist registrado.</td></tr>'; return; }
+            data.forEach(c => {
+                const statusStr = `Pneus:${c.pneus?'✅':'❌'} | Óleo:${c.oleo_fluidos?'✅':'❌'} | Luzes:${c.sinalizacao?'✅':'❌'} | Freios:${c.freios?'✅':'❌'}`;
+                tbody.innerHTML += `<tr><td>${new Date(c.data_checklist).toLocaleString('pt-BR')}</td><td><strong>${c.placa}</strong></td><td>${c.motorista}</td><td>${statusStr}</td><td>${c.observacoes || '-'}</td></tr>`;
+            });
+        }
+
+        async function salvarManutencao() {
+            const placa = document.getElementById('man-placa').value;
+            const tipo = document.getElementById('man-tipo').value;
+            const km_execucao = parseInt(document.getElementById('man-km').value) || 0;
+            const descricao = document.getElementById('man-desc').value.trim();
+
+            if (!descricao || !km_execucao) { mostrarMensagem('Preencha KM e descrição!', 'erro'); return; }
+
+            const { error } = await supabaseClient.from('historico_manutencoes').insert([{ placa, tipo, km_execucao, descricao }]);
+            if (error) { mostrarMensagem('Erro: ' + error.message, 'erro'); return; }
+
+            if (tipo === 'Preventiva') {
+                await supabaseClient.from('veiculos').update({ km_ultima_revisao: km_execucao, km_atual: km_execucao }).eq('placa', placa);
+            }
+
+            mostrarMensagem('Manutenção registrada com sucesso!');
+            document.getElementById('man-desc').value = ''; document.getElementById('man-km').value = '';
+            carregarHistoricoManutencoes(); carregarVeiculos();
+        }
+
+        async function carregarHistoricoManutencoes() {
+            const { data, error } = await supabaseClient.from('historico_manutencoes').select('*').order('data_manutencao', { ascending: false }).limit(20);
+            if (error) return;
+            const tbody = document.querySelector('#tabela-historico-manutencao tbody');
+            tbody.innerHTML = '';
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Nenhuma intervenção registrada.</td></tr>'; return; }
+            data.forEach(m => {
+                const badge = m.tipo === 'Preventiva' ? '<span class="badge badge-disponivel">Preventiva</span>' : '<span class="badge badge-manutencao">Corretiva</span>';
+                tbody.innerHTML += `<tr><td>${new Date(m.data_manutencao).toLocaleDateString('pt-BR')}</td><td><strong>${m.placa}</strong></td><td>${badge}</td><td>${m.km_execucao.toLocaleString('pt-BR')} km</td><td>${m.descricao}</td></tr>`;
+            });
+        }
+
+        carregarVeiculos();
+    </script>
+</body>
+</html>
