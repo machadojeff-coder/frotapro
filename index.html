@@ -124,6 +124,16 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE SEGURANÇA (CAPTURA ERROS DE SINTAXE) -->
+    <script>
+        window.addEventListener('error', function(e) {
+            const main = document.getElementById('mainContent');
+            if (main && main.innerHTML.trim() === '') {
+                main.innerHTML = '<div class="p-8"><div class="p-6 bg-red-900/20 border border-red-500 rounded-xl"><h3 class="text-red-400 font-bold text-lg mb-2">Erro de Código Detectado</h3><p class="text-slate-300 mb-2">Ocorreu um erro no arquivo. Verifique se você copiou as chaves do Supabase corretamente e não apagou as aspas duplas ("").</p><code class="text-xs text-red-300">' + e.message + '</code></div></div>';
+            }
+        });
+    </script>
+
     <script>
         // ==========================================
         // INTEGRAÇÃO AUTOMÁTICA (COLOQUE SUAS CHAVES AQUI)
@@ -147,6 +157,9 @@
         // Função de inicialização direta (Blindada contra erros de iframes/embeds)
         function initApp() {
             try {
+                // FORÇA O DESENHO IMEDIATO DA TELA (Evita a tela preta)
+                render();
+
                 // Ativando os menus de forma segura
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -158,8 +171,7 @@
                 if (AUTO_SUPABASE_URL && AUTO_SUPABASE_KEY) {
                     initSupabase(AUTO_SUPABASE_URL, AUTO_SUPABASE_KEY);
                 } else {
-                    showNotification('Cole as chaves do Supabase no código HTML (linhas 118 e 119) para habilitar o banco de dados online.', 'error');
-                    render();
+                    showNotification('Aviso: As chaves do Supabase não foram preenchidas no código (linhas 128/129). O site funcionará, mas não salvará online.', 'error');
                 }
             } catch (err) {
                 document.getElementById('mainContent').innerHTML = '<div class="p-8 text-red-500 font-bold">Erro fatal ao carregar a interface: ' + err.message + '</div>';
@@ -175,8 +187,8 @@
                 document.getElementById('dbIndicatorText').innerText = 'Supabase Definitivo';
                 fetchAllData();
             } catch (err) {
-                showNotification('Erro ao conectar no Supabase (' + err.message + '). Verifique suas credenciais ou conexão.', 'error');
-                render(); // Força renderizar mesmo se a conexão falhar
+                showNotification('Erro ao conectar no Supabase (' + err.message + '). Verifique suas credenciais.', 'error');
+                render(); 
             }
         }
 
@@ -186,28 +198,27 @@
                 return;
             }
             try {
-                const [v, a, m, d, c] = await Promise.all([
-                    supabaseClient.from('veiculos').select('*'),
-                    supabaseClient.from('abastecimentos').select('*'),
-                    supabaseClient.from('manutencoes').select('*'),
-                    supabaseClient.from('diario_bordo').select('*'),
-                    supabaseClient.from('checklists').select('*')
-                ]);
+                // Buscas independentes: Se uma tabela não existir, não quebra as outras
+                const v = await supabaseClient.from('veiculos').select('*');
+                if (v && v.data) state.veiculos = v.data;
 
-                if (v.error) throw v.error;
-                
-                // Força array vazio caso não haja dados ou haja erro para não quebrar a tela
-                state.veiculos = v.data || [];
-                state.abastecimentos = a.data || [];
-                state.manutencoes = m.data || [];
-                state.diario = d.data || [];
-                state.checklists = c.data || [];
+                const a = await supabaseClient.from('abastecimentos').select('*');
+                if (a && a.data) state.abastecimentos = a.data;
+
+                const m = await supabaseClient.from('manutencoes').select('*');
+                if (m && m.data) state.manutencoes = m.data;
+
+                const d = await supabaseClient.from('diario_bordo').select('*');
+                if (d && d.data) state.diario = d.data;
+
+                const c = await supabaseClient.from('checklists').select('*');
+                if (c && c.data) state.checklists = c.data;
 
             } catch (err) {
                 console.error(err);
-                showNotification('Aviso: Algumas tabelas não foram encontradas. Verifique se criou todas as tabelas no Supabase.', 'error');
+                showNotification('Aviso de Rede: Falha ao puxar os dados. Recarregue a página.', 'error');
             } finally {
-                render(); // Garante que a interface carregue independentemente de erro ou sucesso
+                render(); // Garante a atualização visual
             }
         }
 
@@ -227,29 +238,35 @@
         }
 
         function render() {
-            const titles = {
-                dashboard: 'Dashboard Operacional',
-                veiculos: 'Gerenciamento de Veículos e Viaturas',
-                diario: 'Diário de Bordo e Saídas',
-                checklist: 'Checklist de Saída de Veículos',
-                copiarPlanilha: 'Importação Rápida (Copiar e Colar de Planilha)',
-                abastecimentos: 'Controle de Abastecimentos e Combustível',
-                manutencoes: 'Gestão de Manutenções Corretivas e Preventivas'
-            };
-            document.getElementById('pageTitle').innerText = titles[currentTab];
-            
-            const btnContainer = document.getElementById('actionButtonContainer');
-            if (['veiculos', 'abastecimentos', 'manutencoes', 'diario', 'checklist'].includes(currentTab)) {
-                const labels = { veiculos: 'Novo Veículo', abastecimentos: 'Novo Abastecimento', manutencoes: 'Nova Manutenção', diario: 'Registrar Saída', checklist: 'Novo Checklist' };
-                const modals = { veiculos: 'vehicle', abastecimentos: 'refuel', manutencoes: 'maintenance', diario: 'log', checklist: 'checklist' };
-                btnContainer.innerHTML = `<button onclick="openModal('${modals[currentTab]}')" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-blue-600/30"><svg class="w-5 h-5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg><span>${labels[currentTab]}</span></button>`;
-            } else {
-                btnContainer.innerHTML = '';
-            }
+            try {
+                const titles = {
+                    dashboard: 'Dashboard Operacional',
+                    veiculos: 'Gerenciamento de Veículos e Viaturas',
+                    diario: 'Diário de Bordo e Saídas',
+                    checklist: 'Checklist de Saída de Veículos',
+                    copiarPlanilha: 'Importação Rápida (Copiar e Colar)',
+                    abastecimentos: 'Controle de Abastecimentos',
+                    manutencoes: 'Gestão de Manutenções'
+                };
+                
+                const titleEl = document.getElementById('pageTitle');
+                if (titleEl) titleEl.innerText = titles[currentTab] || 'Gestão de Frota';
+                
+                const btnContainer = document.getElementById('actionButtonContainer');
+                if (btnContainer) {
+                    if (['veiculos', 'abastecimentos', 'manutencoes', 'diario', 'checklist'].includes(currentTab)) {
+                        const labels = { veiculos: 'Novo Veículo', abastecimentos: 'Novo Abastecimento', manutencoes: 'Nova Manutenção', diario: 'Registrar Saída', checklist: 'Novo Checklist' };
+                        const modals = { veiculos: 'vehicle', abastecimentos: 'refuel', manutencoes: 'maintenance', diario: 'log', checklist: 'checklist' };
+                        btnContainer.innerHTML = `<button onclick="openModal('${modals[currentTab]}')" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-blue-600/30"><svg class="w-5 h-5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg><span>${labels[currentTab]}</span></button>`;
+                    } else {
+                        btnContainer.innerHTML = '';
+                    }
+                }
 
-            const content = document.getElementById('mainContent');
-            if (currentTab === 'dashboard') {
-                const unidadesCount = [...new Set(state.veiculos.map(v => v.unidade || 'Matriz'))].length;
+                const content = document.getElementById('mainContent');
+                if (!content) return;
+
+                if (currentTab === 'dashboard') {
                 content.innerHTML = `
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -259,14 +276,14 @@
                                     <h3 class="text-4xl font-extrabold text-white mt-3">${state.veiculos.length}</h3>
                                 </div>
                                 <div class="mt-4 flex items-center text-xs text-emerald-400 font-medium">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
-                                    <span>${supabaseClient ? 'Conectado ao Supabase' : 'Aguardando Conexão'}</span>
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    <span>Atualizado</span>
                                 </div>
                             </div>
                             <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
                                 <div>
                                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Unidades Monitoradas</span>
-                                    <h3 class="text-4xl font-extrabold text-white mt-3">${unidadesCount}</h3>
+                                    <h3 class="text-4xl font-extrabold text-white mt-3">${[...new Set(state.veiculos.map(v => v.unidade || 'Matriz'))].length || 1}</h3>
                                 </div>
                                 <div class="mt-4 text-xs text-slate-400 font-medium">Bases Operacionais Ativas</div>
                             </div>
