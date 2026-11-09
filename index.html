@@ -64,31 +64,31 @@
                 </div>
 
                 <nav class="p-4 space-y-1.5" id="navTabs">
-                    <button onclick="switchTab('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-blue-600 text-white shadow-lg shadow-blue-600/30">
+                    <button data-tab="dashboard" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-blue-600 text-white shadow-lg shadow-blue-600/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                         <span>Dashboard</span>
                     </button>
-                    <button onclick="switchTab('veiculos')" data-tab="veiculos" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="veiculos" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                         <span>Veículos / Viaturas</span>
                     </button>
-                    <button onclick="switchTab('diario')" data-tab="diario" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="diario" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                         <span>Diário de Bordo</span>
                     </button>
-                    <button onclick="switchTab('checklist')" data-tab="checklist" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="checklist" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         <span>Checklist Saída</span>
                     </button>
-                    <button onclick="switchTab('copiarPlanilha')" data-tab="copiarPlanilha" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="copiarPlanilha" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                         <span>Colar de Planilha</span>
                     </button>
-                    <button onclick="switchTab('abastecimentos')" data-tab="abastecimentos" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="abastecimentos" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         <span>Abastecimentos</span>
                     </button>
-                    <button onclick="switchTab('manutencoes')" data-tab="manutencoes" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                    <button data-tab="manutencoes" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
                         <span>Manutenções</span>
                     </button>
@@ -96,13 +96,12 @@
             </div>
 
             <div class="p-4 border-t border-slate-800/80 bg-slate-900/40">
-                <button onclick="openConfigModal()" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/60 text-xs transition-all shadow-inner">
+                <div class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/90 border border-slate-700/60 text-xs shadow-inner">
                     <div class="flex items-center space-x-2">
                         <span id="dbIndicator" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-                        <span id="dbIndicatorText" class="font-semibold text-slate-200">Modo Simulação</span>
+                        <span id="dbIndicatorText" class="font-semibold text-slate-200">Sem Conexão DB</span>
                     </div>
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
-                </button>
+                </div>
             </div>
         </aside>
 
@@ -115,28 +114,6 @@
 
             <div class="flex-1 overflow-y-auto p-4 md:p-8" id="mainContent"></div>
         </main>
-    </div>
-
-    <!-- CONFIG MODAL -->
-    <div id="configModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 hidden">
-        <div class="w-full max-w-lg bg-[#131b2e] border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-white mb-2">Configuração do Supabase</h3>
-            <p class="text-xs text-slate-400 mb-6">Insira a URL e a Chave Pública (Anon Key) do seu projeto no Supabase para salvar online.</p>
-            <form onsubmit="saveConfig(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Supabase URL</label>
-                    <input id="inputUrl" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="https://xyz.supabase.co" />
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Supabase Anon Key</label>
-                    <input id="inputKey" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="eyJhbGciOi..." />
-                </div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeConfigModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Cancelar</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm shadow-lg shadow-blue-600/30 font-semibold">Salvar Conexão</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- DYNAMIC FORM MODAL -->
@@ -167,17 +144,22 @@
             checklists: []
         };
 
-        const DEFAULT_URL = https://tcxomjkrukpzsfpgishj.supabase.co || localStorage.getItem('frotapro_url') || '';
-        const DEFAULT_KEY = sb_publishable__bq6-fRbGLJ7Mqaj00ajhw_O8TnuPbs || localStorage.getItem('frotapro_key') || '';
+        const DEFAULT_URL = https://tcxomjkrukpzsfpgishj.supabase.co;
+        const DEFAULT_KEY = sb_publishable__bq6-fRbGLJ7Mqaj00ajhw_O8TnuPbs;
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Ativando os menus de forma segura (EventListeners no lugar de onclick inline)
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.currentTarget.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+
             if (DEFAULT_URL && DEFAULT_KEY) {
-                document.getElementById('inputUrl').value = DEFAULT_URL;
-                document.getElementById('inputKey').value = DEFAULT_KEY;
                 initSupabase(DEFAULT_URL, DEFAULT_KEY);
             } else {
-                openConfigModal();
-                showNotification('Insira sua URL e Anon Key do Supabase para habilitar o salvamento definitivo online.', 'info');
+                showNotification('Cole as chaves do Supabase no código HTML (linhas 118 e 119) para habilitar o banco de dados online.', 'error');
                 render();
             }
         });
@@ -191,11 +173,15 @@
                 fetchAllData();
             } catch (err) {
                 showNotification('Erro ao conectar no Supabase. Verifique suas credenciais.', 'error');
+                render(); // Força renderizar mesmo se a conexão falhar
             }
         }
 
         async function fetchAllData() {
-            if (!supabaseClient) return;
+            if (!supabaseClient) {
+                render();
+                return;
+            }
             try {
                 const [v, a, m, d, c] = await Promise.all([
                     supabaseClient.from('veiculos').select('*'),
@@ -206,15 +192,19 @@
                 ]);
 
                 if (v.error) throw v.error;
+                
+                // Força array vazio caso não haja dados ou haja erro para não quebrar a tela
                 state.veiculos = v.data || [];
-                if (a.data) state.abastecimentos = a.data;
-                if (m.data) state.manutencoes = m.data;
-                if (d.data) state.diario = d.data;
-                if (c.data) state.checklists = c.data;
+                state.abastecimentos = a.data || [];
+                state.manutencoes = m.data || [];
+                state.diario = d.data || [];
+                state.checklists = c.data || [];
 
-                render();
             } catch (err) {
-                showNotification('Erro ao buscar dados do Supabase. Verifique se as tabelas (veiculos, abastecimentos, manutencoes, diario_bordo, checklists) foram criadas.', 'error');
+                console.error(err);
+                showNotification('Aviso: Algumas tabelas não foram encontradas. Verifique se criou todas as tabelas no Supabase.', 'error');
+            } finally {
+                render(); // Garante que a interface carregue independentemente de erro ou sucesso
             }
         }
 
@@ -622,24 +612,11 @@
         }
 
         function closeModal() { document.getElementById('dynamicModal').classList.add('hidden'); }
-        function openConfigModal() { document.getElementById('configModal').classList.remove('hidden'); }
-        function closeConfigModal() { document.getElementById('configModal').classList.add('hidden'); }
         function closeNotification() { document.getElementById('notificationModal').classList.add('hidden'); }
 
         function showNotification(msg, type = 'success') {
             document.getElementById('notifMessage').innerText = msg;
             document.getElementById('notificationModal').classList.remove('hidden');
-        }
-
-        async function saveConfig(e) {
-            e.preventDefault();
-            const url = document.getElementById('inputUrl').value;
-            const key = document.getElementById('inputKey').value;
-            localStorage.setItem('frotapro_url', url);
-            localStorage.setItem('frotapro_key', key);
-            closeConfigModal();
-            initSupabase(url, key);
-            showNotification('Configuração salva com sucesso!');
         }
 
         async function submitVehicle(e, editId = '') {
