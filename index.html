@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrotaPro - Gestão Operacional</title>
+    <title>FrotaPro - Gestão Operacional Integrada</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -29,7 +29,7 @@
         .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .logo-area { padding: 25px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
         .logo-box { background: var(--primary); color: white; font-weight: bold; font-size: 14px; padding: 8px 10px; border-radius: 8px; }
-        .logo-text h2 { margin: 0; font-size: 18px; color: white; letter-spacing: 0.5px; }
+        .logo-text h2 { margin: 0; font-size: 18px; color: white; }
         
         .menu { padding: 20px 15px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
         .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; border: none; background: transparent; width: 100%; text-align: left; }
@@ -39,12 +39,11 @@
 
         /* Conteúdo Principal */
         .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; }
-        
         .page-header { margin-bottom: 25px; }
         .page-header h1 { margin: 0; font-size: 24px; color: white; }
         .page-header p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 14px; }
 
-        /* Mensagens de Feedback */
+        /* Alertas e Mensagens */
         .msg-box { padding: 14px 18px; margin-bottom: 20px; border-radius: 8px; font-weight: 600; display: none; font-size: 13px; }
         .msg-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid var(--success); }
         .msg-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid var(--danger); }
@@ -80,7 +79,7 @@
         th { background: rgba(15, 23, 42, 0.6); color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 700; }
         tr:hover { background: var(--bg-card-hover); }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-ok { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid var(--success); }
         .badge-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid var(--warning); }
         .badge-err { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid var(--danger); }
@@ -101,7 +100,8 @@
         <div class="menu">
             <button class="menu-item active" onclick="mudarAba('dashboard', this)"><i class="fa-solid fa-chart-simple"></i> Dashboard</button>
             <button class="menu-item" onclick="mudarAba('frota', this)"><i class="fa-solid fa-car"></i> Veículos / Viaturas</button>
-            <button class="menu-item" onclick="mudarAba('importar', this)"><i class="fa-solid fa-file-import"></i> Importar de Planilha</button>
+            <button class="menu-item" onclick="mudarAba('checklist', this)"><i class="fa-solid fa-clipboard-check"></i> Checklist Saída</button>
+            <button class="menu-item" onclick="mudarAba('importar', this)"><i class="fa-solid fa-file-import"></i> Importar Planilha</button>
             <button class="menu-item" onclick="mudarAba('abastecimentos', this)"><i class="fa-solid fa-gas-pump"></i> Abastecimentos</button>
             <button class="menu-item" onclick="mudarAba('manutencoes', this)"><i class="fa-solid fa-wrench"></i> Manutenções</button>
         </div>
@@ -115,7 +115,7 @@
         <div id="aba-dashboard" class="tab-content active">
             <div class="page-header">
                 <h1>Visão Geral da Frota</h1>
-                <p>Acompanhamento de disponibilidade e status das viaturas operacionais.</p>
+                <p>Monitoramento de localização, alertas de óleo (5.000 km) e revisão preventiva (10.000 km).</p>
             </div>
 
             <div class="kpi-grid">
@@ -125,31 +125,45 @@
                     <div class="kpi-sub" id="kpi-disp-txt" style="color: var(--success);">0 disponíveis</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-title">EM ROTA</div>
+                    <div class="kpi-title">EM USO / ROTA</div>
                     <div class="kpi-value" style="color: #60a5fa;" id="kpi-rota">0</div>
-                    <div class="kpi-sub">Em deslocamento</div>
+                    <div class="kpi-sub">Fora do pátio</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-title">EM MANUTENÇÃO</div>
-                    <div class="kpi-value" style="color: var(--warning);" id="kpi-manut">0</div>
-                    <div class="kpi-sub">Oficina ou revisão</div>
+                    <div class="kpi-title">ALERTAS DE ÓLEO</div>
+                    <div class="kpi-value" style="color: var(--warning);" id="kpi-alerta-oleo">0</div>
+                    <div class="kpi-sub">> 5.000 km rodados</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">ALERTAS DE REVISÃO</div>
+                    <div class="kpi-value" style="color: var(--danger);" id="kpi-alerta-rev">0</div>
+                    <div class="kpi-sub">> 10.000 km rodados</div>
                 </div>
             </div>
 
-            <h3 class="section-title">Status Atual das Viaturas</h3>
+            <h3 class="section-title">Status Operacional e Alertas de Manutenção</h3>
             <div class="table-container">
                 <table id="tabela-resumo">
-                    <thead><tr><th>Prefixo / Modelo</th><th>Placa</th><th>Unidade</th><th>Status</th><th>KM Atual</th><th>Revisão</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Prefixo / Viatura</th>
+                            <th>Placa</th>
+                            <th>Status</th>
+                            <th>Localização / Destino de Uso</th>
+                            <th>Óleo (5.000 km)</th>
+                            <th>Revisão (10.000 km)</th>
+                        </tr>
+                    </thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ABA 2: VEÍCULOS (CADASTRO INDIVIDUAL) -->
+        <!-- ABA 2: CADASTRO / EDIÇÃO DE VIATURAS -->
         <div id="aba-frota" class="tab-content">
             <div class="page-header">
                 <h1>Gestão de Viaturas</h1>
-                <p>Cadastre, edite ou remova viaturas individualmente.</p>
+                <p>Controle cadastral, hodômetros e base de manutenções.</p>
             </div>
             
             <div class="form-grid">
@@ -167,14 +181,17 @@
                     </select>
                 </div>
                 <div><label>KM Atual</label><input type="number" id="km_atual" placeholder="45000"></div>
+                <div><label>KM Última Troca de Óleo</label><input type="number" id="km_ultimo_oleo" placeholder="40000"></div>
+                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="40000"></div>
                 <div>
-                    <label>Status</label>
+                    <label>Status Operacional</label>
                     <select id="status">
                         <option value="Disponível">Disponível</option>
                         <option value="Em Rota">Em Rota</option>
                         <option value="Manutenção">Manutenção</option>
                     </select>
                 </div>
+                <div><label>Local / Destino Atual</label><input type="text" id="local_uso" placeholder="Pátio / Unidade"></div>
                 <div style="grid-column: span 2; display: flex; align-items: flex-end;">
                     <button class="btn" style="width: 100%;" onclick="salvarVeiculo()"><i class="fa-solid fa-save"></i> Salvar Viatura</button>
                 </div>
@@ -182,32 +199,61 @@
 
             <div class="table-container">
                 <table id="tabela-frota">
-                    <thead><tr><th>Prefixo / Placa</th><th>Modelo / Unidade</th><th>Combustível</th><th>Status</th><th>KM Atual</th><th>Ações</th></tr></thead>
+                    <thead><tr><th>Prefixo / Placa</th><th>Modelo / Unidade</th><th>Local de Uso</th><th>Status</th><th>KM Atual</th><th>Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ABA 3: IMPORTAR DE PLANILHA (COPIAR E COLAR) -->
+        <!-- ABA 3: CHECKLIST DE SAÍDA / VISTORIA -->
+        <div id="aba-checklist" class="tab-content">
+            <div class="page-header">
+                <h1>Checklist de Inspeção e Saída</h1>
+                <p>Ao registrar o checklist, a viatura pode ser colocada "Em Rota" com o destino preenchido automaticamente.</p>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
+                <div><label>Selecione a Viatura</label><select id="chk-placa"></select></div>
+                <div><label>Motorista / Condutor</label><input type="text" id="chk-motorista" placeholder="Nome do responsável"></div>
+                <div><label>Destino / Missão / Local de Uso</label><input type="text" id="chk-destino" placeholder="Ex: Patrulhamento Setorial"></div>
+                <div><label>KM no Painel</label><input type="number" id="chk-km" placeholder="Ex: 45200"></div>
+                <div><label>Pneus / Calibragem</label><select id="chk-pneus"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div><label>Nível de Óleo e Fluidos</label><select id="chk-oleo"><option value="true">Conforme (OK)</option><option value="false">Baixo / Irregular</option></select></div>
+                <div><label>Sinalização / Luzes</label><select id="chk-sinalizacao"><option value="true">Conforme (OK)</option><option value="false">Irregular / Queimada</option></select></div>
+                <div><label>Freios</label><select id="chk-freios"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
+                <div style="grid-column: span 2;"><label>Observações / Avarias</label><input type="text" id="chk-avarias" placeholder="Arranhões, luz acesa no painel, etc."></div>
+                <div style="grid-column: span 2; display: flex; align-items: flex-end;">
+                    <button class="btn" style="width: 100%;" onclick="salvarChecklist()"><i class="fa-solid fa-clipboard-check"></i> Registrar Checklist e Liberar Viatura</button>
+                </div>
+            </div>
+
+            <h3 class="section-title">Últimos Checklists Executados</h3>
+            <div class="table-container">
+                <table id="tabela-checklists">
+                    <thead><tr><th>Data/Hora</th><th>Viatura</th><th>Motorista</th><th>Destino</th><th>KM Saída</th><th>Inspeção</th><th>Obs</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 4: IMPORTAÇÃO POR COPIAR/COLAR -->
         <div id="aba-importar" class="tab-content">
             <div class="page-header">
                 <h1>Importar Viaturas de Planilha</h1>
-                <p>Copie as linhas da sua planilha (Excel ou Google Sheets) e cole diretamente abaixo.</p>
+                <p>Copie linhas de qualquer planilha e cole abaixo.</p>
             </div>
 
             <div class="info-box">
-                <i class="fa-solid fa-circle-info"></i> <strong>Ordem esperada das colunas na planilha:</strong><br>
-                <code>PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL</code><br>
-                <small>* As colunas Placa e Modelo são obrigatórias. Linhas com títulos de cabeçalho serão ignoradas automaticamente.</small>
+                <i class="fa-solid fa-circle-info"></i> <strong>Ordem das colunas aceita:</strong><br>
+                <code>PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL</code>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label>Cole os dados copiados aqui:</label>
-                <textarea id="paste-area" rows="6" placeholder="Cole aqui os dados da sua planilha (Ctrl+V)..." oninput="processarColagem()"></textarea>
+                <textarea id="paste-area" rows="6" placeholder="Cole aqui (Ctrl+V)..." oninput="processarColagem()"></textarea>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 class="section-title" style="border:none; margin:0;">Prévia dos Dados Detectados (<span id="count-preview">0</span> viaturas)</h3>
+                <h3 class="section-title" style="border:none; margin:0;">Detectados: <span id="count-preview">0</span> viaturas</h3>
                 <button class="btn" id="btn-importar-todos" style="display:none;" onclick="salvarLotePlanilha()"><i class="fa-solid fa-cloud-arrow-up"></i> Confirmar e Salvar no Banco</button>
             </div>
 
@@ -219,18 +265,18 @@
             </div>
         </div>
 
-        <!-- ABA 4: ABASTECIMENTOS -->
+        <!-- ABA 5: ABASTECIMENTOS -->
         <div id="aba-abastecimentos" class="tab-content">
             <div class="page-header">
-                <h1>Abastecimentos</h1>
-                <p>Lançamento de combustível e consumo das viaturas.</p>
+                <h1>Registro de Abastecimento</h1>
+                <p>Lançamento de combustível com atualização automática de quilometragem.</p>
             </div>
 
             <div class="form-grid">
                 <div><label>Viatura</label><select id="abast-placa"></select></div>
                 <div><label>Litros</label><input type="number" step="0.1" id="abast-litros" placeholder="0.0"></div>
                 <div><label>Valor Total (R$)</label><input type="number" step="0.01" id="abast-valor" placeholder="150.00"></div>
-                <div><label>KM Atual</label><input type="number" id="abast-km" placeholder="KM no odômetro"></div>
+                <div><label>KM Atual do Veículo</label><input type="number" id="abast-km" placeholder="KM no odômetro"></div>
                 <div style="display: flex; align-items: flex-end;">
                     <button class="btn" style="width: 100%;" onclick="salvarAbastecimento()"><i class="fa-solid fa-gas-pump"></i> Registrar Abastecimento</button>
                 </div>
@@ -238,25 +284,32 @@
 
             <div class="table-container">
                 <table id="tabela-abastecimentos">
-                    <thead><tr><th>Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM Informado</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ABA 5: MANUTENÇÕES -->
+        <!-- ABA 6: MANUTENÇÕES -->
         <div id="aba-manutencoes" class="tab-content">
             <div class="page-header">
-                <h1>Manutenções</h1>
-                <p>Controle de intervenções mecânicas e revisões preventivas.</p>
+                <h1>Manutenções e Trocas</h1>
+                <p>Ao selecionar "Troca de Óleo" ou "Revisão Geral", os hodômetros de alerta são zerados automaticamente.</p>
             </div>
 
             <div class="form-grid">
                 <div><label>Viatura</label><select id="man-placa"></select></div>
-                <div><label>Tipo</label><select id="man-tipo"><option value="Preventiva">Preventiva</option><option value="Corretiva">Corretiva</option></select></div>
-                <div><label>KM da Intervenção</label><input type="number" id="man-km" placeholder="Ex: 40000"></div>
+                <div>
+                    <label>Tipo de Serviço</label>
+                    <select id="man-tipo">
+                        <option value="Troca de Óleo">Troca de Óleo (Zera ciclo 5.000 km)</option>
+                        <option value="Revisão Geral">Revisão Geral (Zera ciclo 10.000 km)</option>
+                        <option value="Corretiva">Manutenção Corretiva (Reparo)</option>
+                    </select>
+                </div>
+                <div><label>KM da Execução</label><input type="number" id="man-km" placeholder="Ex: 45000"></div>
                 <div><label>Valor (R$)</label><input type="number" step="0.01" id="man-valor" placeholder="0.00"></div>
-                <div style="grid-column: span 2;"><label>Descrição do Serviço / Oficina</label><input type="text" id="man-desc" placeholder="Troca de correia, pastilhas, filtros..."></div>
+                <div style="grid-column: span 2;"><label>Descrição / Oficina</label><input type="text" id="man-desc" placeholder="Troca de filtros, óleo sintético, pastilhas..."></div>
                 <div style="grid-column: span 2; display: flex; align-items: flex-end;">
                     <button class="btn" style="width: 100%;" onclick="salvarManutencao()"><i class="fa-solid fa-wrench"></i> Registrar Manutenção</button>
                 </div>
@@ -273,7 +326,6 @@
     </main>
 
     <script>
-        // === CREDENCIAIS DO SUPABASE ===
         const SUPABASE_URL = 'https://lphbqipxqcuunoomwxpw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
 
@@ -298,7 +350,8 @@
             btnElement.classList.add('active');
 
             if (abaId === 'dashboard') atualizarDashboard();
-            if (abaId === 'abastecimentos' || abaId === 'manutencoes') preencherSelects();
+            if (['checklist', 'abastecimentos', 'manutencoes'].includes(abaId)) preencherSelects();
+            if (abaId === 'checklist') carregarChecklists();
         }
 
         async function carregarTudo() {
@@ -312,6 +365,7 @@
                 preencherSelects();
                 carregarAbastecimentos();
                 carregarManutencoes();
+                carregarChecklists();
             } catch (err) {
                 mostrarMsg('Erro ao conectar ao Supabase: ' + err.message, 'erro');
             }
@@ -321,34 +375,65 @@
             const total = listaVeiculos.length;
             const disp = listaVeiculos.filter(v => v.status === 'Disponível').length;
             const rota = listaVeiculos.filter(v => v.status === 'Em Rota').length;
-            const manut = listaVeiculos.filter(v => v.status === 'Manutenção').length;
 
-            document.getElementById('kpi-total').innerText = total;
-            document.getElementById('kpi-disp-txt').innerText = `${disp} disponíveis`;
-            document.getElementById('kpi-rota').innerText = rota;
-            document.getElementById('kpi-manut').innerText = manut;
+            let alertasOleo = 0;
+            let alertasRev = 0;
 
             const tbody = document.querySelector('#tabela-resumo tbody');
             tbody.innerHTML = '';
+
             listaVeiculos.forEach(v => {
-                const badge = v.status === 'Disponível' ? 'badge-ok' : (v.status === 'Em Rota' ? 'badge-warn' : 'badge-err');
-                const kmU = v.km_ultima_revisao || 0;
-                const limite = kmU + (v.intervalo_revisao || 10000);
-                const revisaoBadge = (v.km_atual || 0) >= limite 
-                    ? '<span class="badge badge-err">Revisão Vencida</span>' 
-                    : '<span class="badge badge-ok">Em Dia</span>';
+                const kmAtual = v.km_atual || 0;
+                const kmUltimoOleo = v.km_ultimo_oleo || 0;
+                const kmUltimaRev = v.km_ultima_revisao || 0;
+
+                // Regra Óleo: a cada 5.000 km
+                const proxOleo = kmUltimoOleo + 5000;
+                const kmRestanteOleo = proxOleo - kmAtual;
+                let badgeOleo = '';
+                if (kmRestanteOleo <= 0) {
+                    badgeOleo = `<span class="badge badge-err">VENCEU (${Math.abs(kmRestanteOleo)} km)</span>`;
+                    alertasOleo++;
+                } else if (kmRestanteOleo <= 500) {
+                    badgeOleo = `<span class="badge badge-warn">Próxima (${kmRestanteOleo} km)</span>`;
+                    alertasOleo++;
+                } else {
+                    badgeOleo = `<span class="badge badge-ok">OK (${kmRestanteOleo} km)</span>`;
+                }
+
+                // Regra Revisão: a cada 10.000 km
+                const proxRev = kmUltimaRev + 10000;
+                const kmRestanteRev = proxRev - kmAtual;
+                let badgeRev = '';
+                if (kmRestanteRev <= 0) {
+                    badgeRev = `<span class="badge badge-err">VENCEU (${Math.abs(kmRestanteRev)} km)</span>`;
+                    alertasRev++;
+                } else if (kmRestanteRev <= 1000) {
+                    badgeRev = `<span class="badge badge-warn">Próxima (${kmRestanteRev} km)</span>`;
+                    alertasRev++;
+                } else {
+                    badgeRev = `<span class="badge badge-ok">OK (${kmRestanteRev} km)</span>`;
+                }
+
+                const badgeStatus = v.status === 'Disponível' ? 'badge-ok' : (v.status === 'Em Rota' ? 'badge-warn' : 'badge-err');
 
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${v.prefixo ? `[${v.prefixo}] ` : ''}</strong>${v.modelo}</td>
                         <td>${v.placa}</td>
-                        <td>${v.unidade || '-'}</td>
-                        <td><span class="badge ${badge}">${v.status || 'Disponível'}</span></td>
-                        <td>${(v.km_atual || 0).toLocaleString('pt-BR')} km</td>
-                        <td>${revisaoBadge}</td>
+                        <td><span class="badge ${badgeStatus}">${v.status || 'Disponível'}</span></td>
+                        <td><i class="fa-solid fa-location-dot" style="color: #60a5fa; margin-right: 5px;"></i>${v.local_uso || 'Pátio'}</td>
+                        <td>${badgeOleo}</td>
+                        <td>${badgeRev}</td>
                     </tr>
                 `;
             });
+
+            document.getElementById('kpi-total').innerText = total;
+            document.getElementById('kpi-disp-txt').innerText = `${disp} disponíveis`;
+            document.getElementById('kpi-rota').innerText = rota;
+            document.getElementById('kpi-alerta-oleo').innerText = alertasOleo;
+            document.getElementById('kpi-alerta-rev').innerText = alertasRev;
         }
 
         function renderizarFrota() {
@@ -360,11 +445,11 @@
                     <tr>
                         <td><strong>${v.prefixo ? `[${v.prefixo}] ` : ''}${v.placa}</strong></td>
                         <td>${v.modelo}<br><small style="color:var(--text-muted)">${v.unidade || '-'}</small></td>
-                        <td>${v.combustivel || 'Flex'}</td>
+                        <td>${v.local_uso || 'Pátio'}</td>
                         <td><span class="badge ${badge}">${v.status || 'Disponível'}</span></td>
                         <td>${(v.km_atual || 0).toLocaleString('pt-BR')} km</td>
                         <td>
-                            <button class="btn btn-action" onclick="prepararEdicao('${v.placa}', '${v.prefixo||''}', '${v.modelo}', '${v.unidade||''}', '${v.combustivel||'Flex'}', '${v.status||'Disponível'}', ${v.km_atual||0})">Editar</button>
+                            <button class="btn btn-action" onclick="prepararEdicao('${v.placa}', '${v.prefixo||''}', '${v.modelo}', '${v.unidade||''}', '${v.combustivel||'Flex'}', '${v.status||'Disponível'}', ${v.km_atual||0}, ${v.km_ultimo_oleo||0}, ${v.km_ultima_revisao||0}, '${v.local_uso||''}')">Editar</button>
                             <button class="btn btn-danger btn-action" onclick="deletarVeiculo('${v.placa}')">Excluir</button>
                         </td>
                     </tr>
@@ -379,32 +464,29 @@
             const unidade = document.getElementById('unidade').value.trim();
             const combustivel = document.getElementById('combustivel').value;
             const status = document.getElementById('status').value;
+            const local_uso = document.getElementById('local_uso').value.trim() || 'Pátio';
             const km_atual = parseInt(document.getElementById('km_atual').value) || 0;
+            const km_ultimo_oleo = parseInt(document.getElementById('km_ultimo_oleo').value) || km_atual;
+            const km_ultima_revisao = parseInt(document.getElementById('km_ultima_revisao').value) || km_atual;
 
             if (!placa || !modelo) {
                 mostrarMsg('Preencha os campos obrigatórios (Placa e Modelo)!', 'erro');
                 return;
             }
 
-            const dados = { placa, prefixo, modelo, unidade, combustivel, status, km_atual };
+            const dados = { placa, prefixo, modelo, unidade, combustivel, status, local_uso, km_atual, km_ultimo_oleo, km_ultima_revisao };
 
-            // Usando upsert para cadastrar ou atualizar de forma garantida
             const { error } = await supabaseClient.from('veiculos').upsert([dados]);
             if (error) {
                 mostrarMsg('Erro do Supabase: ' + error.message, 'erro');
             } else {
                 mostrarMsg('Viatura salva com sucesso!');
-                document.getElementById('placa').value = '';
-                document.getElementById('prefixo').value = '';
-                document.getElementById('modelo').value = '';
-                document.getElementById('unidade').value = '';
-                document.getElementById('km_atual').value = '';
-                document.getElementById('placa').disabled = false;
+                limparFormularioVeiculo();
                 carregarTudo();
             }
         }
 
-        function prepararEdicao(placa, prefixo, modelo, unidade, combustivel, status, km) {
+        function prepararEdicao(placa, prefixo, modelo, unidade, combustivel, status, km, oleo, rev, local) {
             document.getElementById('placa').value = placa;
             document.getElementById('placa').disabled = true;
             document.getElementById('prefixo').value = prefixo;
@@ -413,7 +495,23 @@
             document.getElementById('combustivel').value = combustivel;
             document.getElementById('status').value = status;
             document.getElementById('km_atual').value = km;
+            document.getElementById('km_ultimo_oleo').value = oleo;
+            document.getElementById('km_ultima_revisao').value = rev;
+            document.getElementById('local_uso').value = local;
+            mudarAba('frota', document.querySelectorAll('.menu-item')[1]);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function limparFormularioVeiculo() {
+            document.getElementById('placa').value = '';
+            document.getElementById('placa').disabled = false;
+            document.getElementById('prefixo').value = '';
+            document.getElementById('modelo').value = '';
+            document.getElementById('unidade').value = '';
+            document.getElementById('km_atual').value = '';
+            document.getElementById('km_ultimo_oleo').value = '';
+            document.getElementById('km_ultima_revisao').value = '';
+            document.getElementById('local_uso').value = 'Pátio';
         }
 
         async function deletarVeiculo(placa) {
@@ -424,7 +522,68 @@
             }
         }
 
-        // === IMPORTADOR DE PLANILHA (COPIAR E COLAR) ===
+        // === MÓDULO CHECKLIST ===
+        async function salvarChecklist() {
+            const placa = document.getElementById('chk-placa').value;
+            const motorista = document.getElementById('chk-motorista').value.trim();
+            const destino = document.getElementById('chk-destino').value.trim() || 'Em Operação';
+            const km_saida = parseInt(document.getElementById('chk-km').value) || 0;
+            const pneus = document.getElementById('chk-pneus').value === 'true';
+            const oleo_fluidos = document.getElementById('chk-oleo').value === 'true';
+            const sinalizacao = document.getElementById('chk-sinalizacao').value === 'true';
+            const freios = document.getElementById('chk-freios').value === 'true';
+            const avarias = document.getElementById('chk-avarias').value.trim();
+
+            if (!motorista) {
+                mostrarMsg('Informe o nome do motorista/condutor!', 'erro');
+                return;
+            }
+
+            const dadosChecklist = { placa, motorista, destino, km_saida, pneus, oleo_fluidos, sinalizacao, freios, avarias };
+            const { error } = await supabaseClient.from('checklists_viagem').insert([dadosChecklist]);
+
+            if (error) {
+                mostrarMsg('Erro ao gravar checklist: ' + error.message, 'erro');
+            } else {
+                // Atualiza automaticamente status e local da viatura
+                const updateData = { status: 'Em Rota', local_uso: destino };
+                if (km_saida > 0) updateData.km_atual = km_saida;
+
+                await supabaseClient.from('veiculos').update(updateData).eq('placa', placa);
+
+                mostrarMsg('Checklist salvo! Viatura liberada em rota.');
+                document.getElementById('chk-motorista').value = '';
+                document.getElementById('chk-destino').value = '';
+                document.getElementById('chk-km').value = '';
+                document.getElementById('chk-avarias').value = '';
+                carregarTudo();
+                mudarAba('dashboard', document.querySelectorAll('.menu-item')[0]);
+            }
+        }
+
+        async function carregarChecklists() {
+            const { data } = await supabaseClient.from('checklists_viagem').select('*').order('data_checklist', { ascending: false }).limit(10);
+            const tbody = document.querySelector('#tabela-checklists tbody');
+            tbody.innerHTML = '';
+            if (data) {
+                data.forEach(c => {
+                    const statusStr = `Pneus:${c.pneus?'OK':'X'} | Óleo:${c.oleo_fluidos?'OK':'X'} | Luzes:${c.sinalizacao?'OK':'X'} | Freios:${c.freios?'OK':'X'}`;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(c.data_checklist).toLocaleString('pt-BR')}</td>
+                            <td><strong>${c.placa}</strong></td>
+                            <td>${c.motorista}</td>
+                            <td>${c.destino || '-'}</td>
+                            <td>${c.km_saida ? c.km_saida + ' km' : '-'}</td>
+                            <td>${statusStr}</td>
+                            <td>${c.avarias || '-'}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // === IMPORTADOR DE PLANILHA ===
         function processarColagem() {
             const rawText = document.getElementById('paste-area').value.trim();
             if (!rawText) {
@@ -443,8 +602,6 @@
             linhas.forEach((linha, idx) => {
                 const colunas = linha.split(/\t|;/).map(c => c.trim());
                 if (colunas.length < 2) return;
-
-                // Ignora linha se for cabeçalho
                 if (idx === 0 && (colunas[0].toLowerCase().includes('placa') || colunas[1].toLowerCase().includes('modelo'))) return;
 
                 const placa = (colunas[0] || '').toUpperCase();
@@ -457,7 +614,8 @@
                 if (placa && modelo) {
                     veiculosParaImportar.push({
                         placa, prefixo, modelo, unidade, combustivel, km_atual,
-                        status: 'Disponível', km_ultima_revisao: km_atual, intervalo_revisao: 10000
+                        km_ultimo_oleo: km_atual, km_ultima_revisao: km_atual,
+                        status: 'Disponível', local_uso: 'Pátio'
                     });
 
                     tbody.innerHTML += `
@@ -477,30 +635,26 @@
             if (veiculosParaImportar.length > 0) {
                 document.getElementById('container-preview').style.display = 'block';
                 document.getElementById('btn-importar-todos').style.display = 'inline-block';
-            } else {
-                document.getElementById('container-preview').style.display = 'none';
-                document.getElementById('btn-importar-todos').style.display = 'none';
             }
         }
 
         async function salvarLotePlanilha() {
             if (veiculosParaImportar.length === 0) return;
-
             const { error } = await supabaseClient.from('veiculos').upsert(veiculosParaImportar);
             if (error) {
-                mostrarMsg('Erro ao importar viaturas: ' + error.message, 'erro');
+                mostrarMsg('Erro ao importar: ' + error.message, 'erro');
             } else {
                 mostrarMsg(`${veiculosParaImportar.length} viaturas importadas com sucesso!`);
                 document.getElementById('paste-area').value = '';
                 processarColagem();
                 carregarTudo();
-                mudarAba('frota', document.querySelectorAll('.menu-item')[1]);
+                mudarAba('dashboard', document.querySelectorAll('.menu-item')[0]);
             }
         }
 
         // === ABASTECIMENTOS E MANUTENÇÕES ===
         function preencherSelects() {
-            const selects = ['abast-placa', 'man-placa'];
+            const selects = ['abast-placa', 'man-placa', 'chk-placa'];
             selects.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -551,18 +705,25 @@
             const valor = parseFloat(document.getElementById('man-valor').value) || 0;
             const descricao = document.getElementById('man-desc').value.trim();
 
-            if (!descricao) {
-                mostrarMsg('Preencha a descrição da manutenção!', 'erro');
+            if (!descricao || km_execucao <= 0) {
+                mostrarMsg('Preencha a descrição e o KM da manutenção!', 'erro');
                 return;
             }
 
             const { error } = await supabaseClient.from('historico_manutencoes').insert([{ placa, tipo, km_execucao, valor, descricao }]);
-            if (error) mostrarMsg('Erro: ' + error.message, 'erro');
-            else {
-                if (tipo === 'Preventiva' && km_execucao > 0) {
-                    await supabaseClient.from('veiculos').update({ km_ultima_revisao: km_execucao, km_atual: km_execucao }).eq('placa', placa);
+            if (error) {
+                mostrarMsg('Erro: ' + error.message, 'erro');
+            } else {
+                const updateData = { km_atual: km_execucao };
+                if (tipo === 'Troca de Óleo') updateData.km_ultimo_oleo = km_execucao;
+                if (tipo === 'Revisão Geral') {
+                    updateData.km_ultima_revisao = km_execucao;
+                    updateData.km_ultimo_oleo = km_execucao; // Revisão zera ambos
                 }
-                mostrarMsg('Manutenção registrada!');
+
+                await supabaseClient.from('veiculos').update(updateData).eq('placa', placa);
+
+                mostrarMsg('Manutenção registrada e ciclos de alerta atualizados!');
                 document.getElementById('man-km').value = '';
                 document.getElementById('man-valor').value = '';
                 document.getElementById('man-desc').value = '';
@@ -575,7 +736,7 @@
             const tbody = document.querySelector('#tabela-manutencoes tbody');
             tbody.innerHTML = '';
             if (data) data.forEach(m => {
-                const cor = m.tipo === 'Preventiva' ? 'badge-ok' : 'badge-err';
+                const cor = m.tipo.includes('Corretiva') ? 'badge-err' : 'badge-ok';
                 tbody.innerHTML += `<tr><td>${new Date(m.data_manutencao).toLocaleDateString('pt-BR')}</td><td><strong>${m.placa}</strong></td><td><span class="badge ${cor}">${m.tipo}</span></td><td>${m.descricao}</td><td>${m.km_execucao || '-'} km</td><td>R$ ${parseFloat(m.valor || 0).toFixed(2)}</td></tr>`;
             });
         }
