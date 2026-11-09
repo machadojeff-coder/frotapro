@@ -148,6 +148,13 @@
     </div>
 
     <script>
+        // ==========================================
+        // INTEGRAÇÃO AUTOMÁTICA (COLOQUE SUAS CHAVES AQUI)
+        // ==========================================
+        const AUTO_SUPABASE_URL = ""; // Ex: "https://xyz.supabase.co"
+        const AUTO_SUPABASE_KEY = ""; // Ex: "eyJhbGciOi..."
+        // ==========================================
+
         let currentTab = 'dashboard';
         let supabaseClient = null;
         let isSimulated = false; // Real mode by default
@@ -160,8 +167,8 @@
             checklists: []
         };
 
-        const DEFAULT_URL = localStorage.getItem('frotapro_url') || '';
-        const DEFAULT_KEY = localStorage.getItem('frotapro_key') || '';
+        const DEFAULT_URL = https://tcxomjkrukpzsfpgishj.supabase.co || localStorage.getItem('frotapro_url') || '';
+        const DEFAULT_KEY = sb_publishable__bq6-fRbGLJ7Mqaj00ajhw_O8TnuPbs || localStorage.getItem('frotapro_key') || '';
 
         window.addEventListener('DOMContentLoaded', () => {
             if (DEFAULT_URL && DEFAULT_KEY) {
