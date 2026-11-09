@@ -128,8 +128,8 @@
         // ==========================================
         // INTEGRAÇÃO AUTOMÁTICA (COLOQUE SUAS CHAVES AQUI)
         // ==========================================
-        const AUTO_SUPABASE_URL = ""; // Ex: "https://xyz.supabase.co"
-        const AUTO_SUPABASE_KEY = ""; // Ex: "eyJhbGciOi..."
+        const AUTO_SUPABASE_URL = "https://tcxomjkrukpzsfpgishj.supabase.co"; // Ex: "https://xyz.supabase.co"
+        const AUTO_SUPABASE_KEY = "sb_publishable__bq6-fRbGLJ7Mqaj00ajhw_O8TnuPbs"; // Ex: "eyJhbGciOi..."
         // ==========================================
 
         let currentTab = 'dashboard';
@@ -144,35 +144,38 @@
             checklists: []
         };
 
-        const DEFAULT_URL = https://tcxomjkrukpzsfpgishj.supabase.co;
-        const DEFAULT_KEY = sb_publishable__bq6-fRbGLJ7Mqaj00ajhw_O8TnuPbs;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            // Ativando os menus de forma segura (EventListeners no lugar de onclick inline)
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const tab = e.currentTarget.getAttribute('data-tab');
-                    switchTab(tab);
+        // Função de inicialização direta (Blindada contra erros de iframes/embeds)
+        function initApp() {
+            try {
+                // Ativando os menus de forma segura
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.currentTarget.getAttribute('data-tab');
+                        switchTab(tab);
+                    });
                 });
-            });
 
-            if (DEFAULT_URL && DEFAULT_KEY) {
-                initSupabase(DEFAULT_URL, DEFAULT_KEY);
-            } else {
-                showNotification('Cole as chaves do Supabase no código HTML (linhas 118 e 119) para habilitar o banco de dados online.', 'error');
-                render();
+                if (AUTO_SUPABASE_URL && AUTO_SUPABASE_KEY) {
+                    initSupabase(AUTO_SUPABASE_URL, AUTO_SUPABASE_KEY);
+                } else {
+                    showNotification('Cole as chaves do Supabase no código HTML (linhas 118 e 119) para habilitar o banco de dados online.', 'error');
+                    render();
+                }
+            } catch (err) {
+                document.getElementById('mainContent').innerHTML = '<div class="p-8 text-red-500 font-bold">Erro fatal ao carregar a interface: ' + err.message + '</div>';
             }
-        });
+        }
 
         function initSupabase(url, key) {
             try {
+                if (!window.supabase) throw new Error("Biblioteca do Supabase não carregada.");
                 supabaseClient = window.supabase.createClient(url, key);
                 isSimulated = false;
                 document.getElementById('dbIndicator').className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
                 document.getElementById('dbIndicatorText').innerText = 'Supabase Definitivo';
                 fetchAllData();
             } catch (err) {
-                showNotification('Erro ao conectar no Supabase. Verifique suas credenciais.', 'error');
+                showNotification('Erro ao conectar no Supabase (' + err.message + '). Verifique suas credenciais ou conexão.', 'error');
                 render(); // Força renderizar mesmo se a conexão falhar
             }
         }
@@ -207,6 +210,9 @@
                 render(); // Garante que a interface carregue independentemente de erro ou sucesso
             }
         }
+
+        // Executa a inicialização imediatamente (garante funcionamento em Vercel e Iframes)
+        initApp();
 
         function switchTab(tab) {
             currentTab = tab;
@@ -286,7 +292,7 @@
                                                 <p class="font-semibold text-sm text-white">${d.placa} • <span class="text-blue-400">${d.motorista}</span></p>
                                                 <p class="text-xs text-slate-400">Destino: ${d.destino} (${d.finalidade})</p>
                                             </div>
-                                            <span class="text-xs font-mono text-slate-300">${d.km_saida} km</span>
+                                            <span class="text-xs font-mono text-slate-300">${d.km_saida ? Number(d.km_saida).toLocaleString() : '0'} km</span>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -324,7 +330,7 @@
                                         <td class="p-4 text-slate-300">${v.marca} ${v.modelo}</td>
                                         <td class="p-4 text-slate-300">${v.unidade || 'Matriz'}</td>
                                         <td class="p-4 text-slate-400">${v.ano}</td>
-                                        <td class="p-4 text-slate-300 font-mono">${v.km?.toLocaleString()} km</td>
+                                        <td class="p-4 text-slate-300 font-mono">${v.km ? Number(v.km).toLocaleString() : '0'} km</td>
                                         <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${v.status}</span></td>
                                         <td class="p-4 text-right space-x-2">
                                             <button onclick="editVehicle('${v.id}')" class="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 text-xs font-medium">Editar</button>
@@ -353,7 +359,7 @@
                                         <td class="p-4 text-slate-300">${d.destino}</td>
                                         <td class="p-4 text-slate-400">${d.finalidade}</td>
                                         <td class="p-4 font-mono text-slate-300 flex justify-between items-center space-x-4">
-                                            <span>${d.km_saida?.toLocaleString()} km</span>
+                                            <span>${d.km_saida ? Number(d.km_saida).toLocaleString() : '0'} km</span>
                                             <button onclick="deleteRecord('diario_bordo', '${d.id}')" class="px-2 py-1 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium transition-all">Excluir</button>
                                         </td>
                                     </tr>
@@ -532,7 +538,10 @@
                             <div><label class="block text-xs uppercase text-slate-400 mb-1">Litros</label><input required type="number" step="0.01" id="rLitros" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                             <div><label class="block text-xs uppercase text-slate-400 mb-1">Valor Total (R$)</label><input required type="number" step="0.01" id="rValor" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Posto</label><input required id="rPosto" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Auto Posto BR"/></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">KM Atual</label><input required type="number" id="rKm" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Ex: 15400"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Posto</label><input required id="rPosto" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Auto Posto BR"/></div>
+                        </div>
                         <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar</button></div>
                     </form>`;
             } else if (type === 'maintenance') {
@@ -584,7 +593,6 @@
         }
 
         async function deleteVehicle(id) {
-            if (!confirm('Deseja realmente excluir este veículo?')) return;
             if (supabaseClient) {
                 const { error } = await supabaseClient.from('veiculos').delete().eq('id', id);
                 if (error) {
@@ -597,7 +605,6 @@
         }
 
         async function deleteRecord(table, id) {
-            if (!confirm('Deseja realmente excluir este registro de forma permanente?')) return;
             if (supabaseClient) {
                 const { error } = await supabaseClient.from(table).delete().eq('id', id);
                 if (error) {
@@ -634,19 +641,19 @@
                 if (editId) {
                     const { error } = await supabaseClient.from('veiculos').update(item).eq('id', editId);
                     if (error) {
-                        showNotification('Erro ao atualizar no Supabase: ' + error.message, 'error');
+                        showNotification('Permissão negada ou erro no Supabase (Verifique o RLS). Detalhe: ' + error.message, 'error');
                         return;
                     }
                 } else {
                     const { error } = await supabaseClient.from('veiculos').insert([item]);
                     if (error) {
-                        showNotification('Erro ao salvar no Supabase: ' + error.message, 'error');
+                        showNotification('Permissão negada ou erro no Supabase (Verifique o RLS). Detalhe: ' + error.message, 'error');
                         return;
                     }
                 }
-                fetchAllData();
+                await fetchAllData();
             } else {
-                showNotification('Conecte ao Supabase primeiro para salvar de forma definitiva.', 'error');
+                showNotification('Você precisa inserir suas chaves AUTO_SUPABASE_URL e KEY no código fonte.', 'error');
                 return;
             }
             closeModal();
@@ -660,7 +667,7 @@
                 litros: Number(document.getElementById('rLitros').value),
                 valor_total: Number(document.getElementById('rValor').value),
                 posto: document.getElementById('rPosto').value,
-                km: 15000,
+                km: Number(document.getElementById('rKm').value),
                 data: new Date().toISOString().split('T')[0]
             };
             if (supabaseClient) {
@@ -669,7 +676,7 @@
                     showNotification('Erro ao salvar abastecimento: ' + error.message, 'error');
                     return;
                 }
-                fetchAllData();
+                await fetchAllData();
             }
             closeModal();
             showNotification('Abastecimento salvo definitivamente no Supabase!', 'success');
