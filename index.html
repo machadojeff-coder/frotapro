@@ -65,6 +65,7 @@
         label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
         input, select, textarea { width: 100%; padding: 10px; background: var(--bg-body); border: 1px solid var(--border-light); color: white; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        input:disabled { background: rgba(15, 23, 42, 0.5); color: #64748b; cursor: not-allowed; }
         
         button.btn { padding: 10px 18px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; color: white; background: var(--primary); transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
         button.btn:hover { background: var(--primary-hover); }
@@ -93,13 +94,10 @@
 </head>
 <body>
 
-    <!-- Barra Lateral -->
     <nav class="sidebar">
         <div class="logo-area">
             <div class="logo-box">FP</div>
-            <div class="logo-text">
-                <h2>FrotaPro</h2>
-            </div>
+            <div class="logo-text"><h2>FrotaPro</h2></div>
         </div>
         <div class="menu">
             <button class="menu-item active" onclick="mudarAba('dashboard', this)"><i class="fa-solid fa-chart-simple"></i> Dashboard</button>
@@ -112,7 +110,6 @@
         </div>
     </nav>
 
-    <!-- Conteúdo Principal -->
     <main class="main-content">
         <div id="feedback-msg" class="msg-box"></div>
 
@@ -122,57 +119,27 @@
                 <h1>Visão Geral da Frota</h1>
                 <p>Status operacional das viaturas e alertas preventivos.</p>
             </div>
-
             <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-title">TOTAL DE VEÍCULOS</div>
-                    <div class="kpi-value" id="kpi-total">0</div>
-                    <div class="kpi-sub" id="kpi-disp-txt" style="color: var(--success);">0 disponíveis</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">EM USO / ROTA</div>
-                    <div class="kpi-value" style="color: #60a5fa;" id="kpi-rota">0</div>
-                    <div class="kpi-sub">Viagens em andamento</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">ALERTAS DE ÓLEO</div>
-                    <div class="kpi-value" style="color: var(--warning);" id="kpi-alerta-oleo">0</div>
-                    <div class="kpi-sub">> 5.000 km rodados</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">ALERTAS DE REVISÃO</div>
-                    <div class="kpi-value" style="color: var(--danger);" id="kpi-alerta-rev">0</div>
-                    <div class="kpi-sub">> 10.000 km rodados</div>
-                </div>
+                <div class="kpi-card"><div class="kpi-title">TOTAL DE VEÍCULOS</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-sub" id="kpi-disp-txt" style="color: var(--success);">0 disponíveis</div></div>
+                <div class="kpi-card"><div class="kpi-title">EM USO / ROTA</div><div class="kpi-value" style="color: #60a5fa;" id="kpi-rota">0</div><div class="kpi-sub">Viagens em andamento</div></div>
+                <div class="kpi-card"><div class="kpi-title">ALERTAS DE ÓLEO</div><div class="kpi-value" style="color: var(--warning);" id="kpi-alerta-oleo">0</div><div class="kpi-sub">> 5.000 km rodados</div></div>
+                <div class="kpi-card"><div class="kpi-title">ALERTAS DE REVISÃO</div><div class="kpi-value" style="color: var(--danger);" id="kpi-alerta-rev">0</div><div class="kpi-sub">> 10.000 km rodados</div></div>
             </div>
-
-            <div class="section-header">
-                <h3 class="section-title">Status Operacional</h3>
-            </div>
+            <div class="section-header"><h3 class="section-title">Status Operacional</h3></div>
             <div class="table-container">
                 <table id="tabela-resumo">
-                    <thead>
-                        <tr>
-                            <th>Prefixo / Viatura</th>
-                            <th>Placa</th>
-                            <th>Status</th>
-                            <th>Localização / Destino</th>
-                            <th>Troca de Óleo (5k)</th>
-                            <th>Revisão Geral (10k)</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Prefixo / Viatura</th><th>Placa</th><th>Status</th><th>Localização / Destino</th><th>Troca de Óleo (5k)</th><th>Revisão Geral (10k)</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ABA 2: CADASTRO / EDIÇÃO -->
+        <!-- ABA 2: CADASTRO E EDIÇÃO DE FROTA -->
         <div id="aba-frota" class="tab-content">
             <div class="page-header">
                 <h1>Gestão de Viaturas</h1>
                 <p>Cadastro, edição e exclusão de viaturas da frota.</p>
             </div>
-            
             <div class="form-grid">
                 <div><label>Placa *</label><input type="text" id="placa" placeholder="ABC-1234"></div>
                 <div><label>Prefixo</label><input type="text" id="prefixo" placeholder="Ex: V-2301"></div>
@@ -183,8 +150,8 @@
                     <select id="combustivel"><option>Diesel</option><option>Flex</option><option>Gasolina</option></select>
                 </div>
                 <div><label>KM Atual</label><input type="number" id="km_atual" placeholder="45000"></div>
-                <div><label>KM Última Troca de Óleo</label><input type="number" id="km_ultimo_oleo" placeholder="40000"></div>
-                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="40000"></div>
+                <div><label>KM Última Troca de Óleo</label><input type="number" id="km_ultimo_oleo" placeholder="Opcional"></div>
+                <div><label>KM Última Revisão</label><input type="number" id="km_ultima_revisao" placeholder="Opcional"></div>
                 <div>
                     <label>Status Operacional</label>
                     <select id="status"><option>Disponível</option><option>Em Rota</option><option>Manutenção</option></select>
@@ -196,7 +163,6 @@
                     <button class="btn btn-danger" style="flex: 1;" onclick="limparFormularioVeiculo()"><i class="fa-solid fa-xmark"></i> Cancelar / Limpar</button>
                 </div>
             </div>
-
             <div class="table-container">
                 <table id="tabela-frota">
                     <thead><tr><th>Prefixo / Placa</th><th>Modelo / Unidade</th><th>Local de Uso</th><th>Status</th><th>KM Atual</th><th>Ações</th></tr></thead>
@@ -209,13 +175,11 @@
         <div id="aba-diario" class="tab-content">
             <div class="page-header">
                 <h1>Diário de Bordo</h1>
-                <p>Controle de saídas e retornos.</p>
+                <p>O KM final só pode ser inserido no retorno ao pátio. Enquanto isso, a viatura permanece em uso.</p>
             </div>
-
+            <!-- ETAPA 1: SAÍDA -->
             <div class="diario-bloco">
-                <h3 style="color: #60a5fa; margin-top:0; margin-bottom:15px; font-size:15px;">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> 1. Registrar Saída (Início da Missão)
-                </h3>
+                <h3 style="color: #60a5fa; margin-top:0; margin-bottom:15px; font-size:15px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> 1. Registrar Saída (Início da Missão)</h3>
                 <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:0; background:transparent; padding:0; border:none;">
                     <div><label>Viatura Disponível</label><select id="diario-saida-placa" onchange="atualizarKmSaida()"></select></div>
                     <div><label>Data da Saída</label><input type="date" id="diario-saida-data"></div>
@@ -228,16 +192,11 @@
                     </div>
                 </div>
             </div>
-
+            <!-- ETAPA 2: RETORNO -->
             <div class="diario-bloco" style="border-color: rgba(16, 185, 129, 0.4);">
-                <h3 style="color: #34d399; margin-top:0; margin-bottom:15px; font-size:15px;">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> 2. Encerrar Missão e Liberar Viatura
-                </h3>
+                <h3 style="color: #34d399; margin-top:0; margin-bottom:15px; font-size:15px;"><i class="fa-solid fa-arrow-right-to-bracket"></i> 2. Encerrar Missão e Liberar Viatura</h3>
                 <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:0; background:transparent; padding:0; border:none;">
-                    <div style="grid-column: span 2;">
-                        <label>Selecione a Viagem em Aberto</label>
-                        <select id="diario-retorno-id" onchange="selecionarViagemParaRetorno()"></select>
-                    </div>
+                    <div style="grid-column: span 2;"><label>Selecione a Viagem em Aberto</label><select id="diario-retorno-id" onchange="selecionarViagemParaRetorno()"></select></div>
                     <div><label>KM Inicial Registrado</label><input type="number" id="diario-retorno-km-ini" readonly style="background: rgba(15, 23, 42, 0.6); color: #94a3b8;"></div>
                     <div><label>KM Final no Retorno *</label><input type="number" id="diario-retorno-km-fim" placeholder="Ex: 150300" oninput="calcularKmRetorno()"></div>
                     <div><label>KM Rodado</label><input type="number" id="diario-retorno-km-rodado" readonly style="background: rgba(15, 23, 42, 0.6); color: #34d399; font-weight: bold;"></div>
@@ -246,24 +205,13 @@
                     </div>
                 </div>
             </div>
-
-            <div class="section-header">
-                <h3 class="section-title">Histórico de Viagens</h3>
-                <button class="btn btn-success btn-action" onclick="baixarRelatorioDiario()"><i class="fa-solid fa-file-excel"></i> Baixar Relatório (CSV)</button>
-            </div>
-            <div class="table-container">
-                <table id="tabela-diario">
-                    <thead><tr><th>Data Saída</th><th>Viatura</th><th>Motorista</th><th>Destino</th><th>KM Inicial</th><th>KM Final</th><th>KM Rodado</th><th>Status</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <div class="section-header"><h3 class="section-title">Histórico de Viagens</h3><button class="btn btn-success btn-action" onclick="baixarRelatorioDiario()"><i class="fa-solid fa-file-excel"></i> Baixar Relatório (CSV)</button></div>
+            <div class="table-container"><table id="tabela-diario"><thead><tr><th>Data Saída</th><th>Viatura</th><th>Motorista</th><th>Destino</th><th>KM Inicial</th><th>KM Final</th><th>KM Rodado</th><th>Status</th></tr></thead><tbody></tbody></table></div>
         </div>
 
         <!-- ABA 4: CHECKLIST -->
         <div id="aba-checklist" class="tab-content">
-            <div class="page-header">
-                <h1>Checklist de Inspeção</h1>
-            </div>
+            <div class="page-header"><h1>Checklist de Inspeção</h1></div>
             <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
                 <div><label>Viatura</label><select id="chk-placa"></select></div>
                 <div><label>Motorista</label><input type="text" id="chk-motorista"></div>
@@ -276,14 +224,19 @@
                 <div style="grid-column: span 2;"><label>Avarias</label><input type="text" id="chk-avarias"></div>
                 <div style="grid-column: span 2;"><button class="btn" style="width: 100%;" onclick="salvarChecklist()"><i class="fa-solid fa-clipboard-check"></i> Registrar Checklist</button></div>
             </div>
+            <div class="section-header"><h3 class="section-title">Últimos Checklists</h3><button class="btn btn-success btn-action" onclick="baixarRelatorioChecklist()"><i class="fa-solid fa-file-excel"></i> Baixar Relatório (CSV)</button></div>
             <div class="table-container"><table id="tabela-checklists"><thead><tr><th>Data</th><th>Viatura</th><th>Motorista</th><th>Destino</th><th>KM</th><th>Status</th><th>Avarias</th></tr></thead><tbody></tbody></table></div>
         </div>
 
         <!-- ABA 5: IMPORTAR PLANILHA -->
         <div id="aba-importar" class="tab-content">
             <div class="page-header"><h1>Importar Lote</h1></div>
-            <textarea id="paste-area" rows="6" placeholder="PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL" oninput="processarColagem()" style="width:100%; padding:10px;"></textarea>
-            <div style="margin-top:15px;"><button class="btn" id="btn-importar-todos" style="display:none;" onclick="salvarLotePlanilha()">Confirmar e Salvar Lote</button></div>
+            <div class="info-box"><i class="fa-solid fa-circle-info"></i> <strong>Colunas:</strong> <code>PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL</code></div>
+            <textarea id="paste-area" rows="6" placeholder="Cole aqui (Ctrl+V)..." oninput="processarColagem()" style="width:100%; padding:10px; background:var(--bg-body); color:white; border:1px solid var(--border-light); border-radius:6px;"></textarea>
+            <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                <h3 class="section-title" style="margin:0; border:none;">Detectados: <span id="count-preview">0</span></h3>
+                <button class="btn" id="btn-importar-todos" style="display:none;" onclick="salvarLotePlanilha()">Confirmar e Salvar Lote</button>
+            </div>
             <div class="table-container" id="container-preview" style="display:none; margin-top:15px;"><table id="tabela-preview"><thead><tr><th>Placa</th><th>Modelo</th><th>KM</th></tr></thead><tbody></tbody></table></div>
         </div>
 
@@ -313,16 +266,15 @@
             </div>
             <div class="table-container"><table id="tabela-manutencoes"><thead><tr><th>Data</th><th>Placa</th><th>Tipo</th><th>Descrição</th><th>KM</th><th>Custo</th></tr></thead><tbody></tbody></table></div>
         </div>
-
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://lphbqipxqcuunoomwxpw.supabase.co';
+        const SUPABASE_URL = 'https://hoyoudgzowymkmgmojrz.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
-        let supabaseClient;
         
+        let supabaseClient;
         try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } 
-        catch (e) { console.error('Erro:', e); }
+        catch (e) { console.error('Erro na inicialização do Supabase:', e); }
 
         let listaVeiculos = [];
         let cacheChecklists = [];
@@ -366,7 +318,7 @@
                 carregarManutencoes();
                 carregarChecklists();
                 carregarDiarioBordo();
-            } catch (err) { mostrarMsg('Erro: ' + err.message, 'erro'); }
+            } catch (err) { mostrarMsg('Erro ao carregar dados: ' + err.message, 'erro'); }
         }
 
         function atualizarDashboard() {
@@ -397,37 +349,68 @@
             document.getElementById('kpi-alerta-rev').innerText = alertasRev;
         }
 
+        // ==========================
+        // MÓDULO: GESTÃO DE FROTA
+        // ==========================
         function renderizarFrota() {
             const tbody = document.querySelector('#tabela-frota tbody');
             if(!tbody) return; tbody.innerHTML = '';
             listaVeiculos.forEach(v => {
                 const badge = v.status === 'Disponível' ? 'badge-ok' : (v.status === 'Em Rota' ? 'badge-warn' : 'badge-err');
-                tbody.innerHTML += `<tr><td><strong>${v.prefixo||''} ${v.placa}</strong></td><td>${v.modelo}<br><small style="color:var(--text-muted)">${v.unidade||'-'}</small></td><td>${v.local_uso||'Pátio'}</td><td><span class="badge ${badge}">${v.status}</span></td><td>${(v.km_atual||0)} km</td><td><button class="btn btn-action" onclick="prepararEdicao('${v.placa}','${v.prefixo||''}','${v.modelo}','${v.unidade||''}','${v.combustivel||'Flex'}','${v.status}','${v.km_atual||0}','${v.km_ultimo_oleo||0}','${v.km_ultima_revisao||0}','${v.local_uso||''}')">Editar</button> <button class="btn btn-danger btn-action" onclick="deletarVeiculo('${v.placa}')">X</button></td></tr>`;
+                tbody.innerHTML += `<tr>
+                    <td><strong>${v.prefixo||''} ${v.placa}</strong></td>
+                    <td>${v.modelo}<br><small style="color:var(--text-muted)">${v.unidade||'-'}</small></td>
+                    <td>${v.local_uso||'Pátio'}</td>
+                    <td><span class="badge ${badge}">${v.status}</span></td>
+                    <td>${(v.km_atual||0)} km</td>
+                    <td>
+                        <button class="btn btn-action" onclick="prepararEdicao('${v.placa}', '${v.prefixo||''}', '${v.modelo}', '${v.unidade||''}', '${v.combustivel||'Flex'}', '${v.status}', ${v.km_atual||0}, ${v.km_ultimo_oleo||0}, ${v.km_ultima_revisao||0}, '${v.local_uso||''}')">Editar</button>
+                        <button class="btn btn-danger btn-action" onclick="deletarVeiculo('${v.placa}')">X</button>
+                    </td>
+                </tr>`;
             });
         }
 
         async function salvarVeiculo() {
             const placa = document.getElementById('placa').value.trim().toUpperCase();
             const modelo = document.getElementById('modelo').value.trim();
-            if (!placa || !modelo) return mostrarMsg('Placa e Modelo são obrigatórios!', 'erro');
+            if (!placa || !modelo) return mostrarMsg('A Placa e o Modelo são obrigatórios!', 'erro');
+
+            const kmAtualStr = document.getElementById('km_atual').value;
+            const kmOleoStr = document.getElementById('km_ultimo_oleo').value;
+            const kmRevStr = document.getElementById('km_ultima_revisao').value;
+
+            const km_atual = kmAtualStr ? parseInt(kmAtualStr) : 0;
+            // Se o campo estiver vazio, pega o valor do km_atual
+            const km_ultimo_oleo = kmOleoStr ? parseInt(kmOleoStr) : km_atual;
+            const km_ultima_revisao = kmRevStr ? parseInt(kmRevStr) : km_atual;
 
             const dados = {
-                placa, prefixo: document.getElementById('prefixo').value.trim(), modelo, 
-                unidade: document.getElementById('unidade').value.trim(), combustivel: document.getElementById('combustivel').value,
-                status: document.getElementById('status').value, local_uso: document.getElementById('local_uso').value.trim() || 'Pátio / Unidade',
-                km_atual: parseInt(document.getElementById('km_atual').value) || 0,
-                km_ultimo_oleo: parseInt(document.getElementById('km_ultimo_oleo').value) || 0,
-                km_ultima_revisao: parseInt(document.getElementById('km_ultima_revisao').value) || 0
+                placa,
+                prefixo: document.getElementById('prefixo').value.trim(),
+                modelo, 
+                unidade: document.getElementById('unidade').value.trim(),
+                combustivel: document.getElementById('combustivel').value,
+                status: document.getElementById('status').value,
+                local_uso: document.getElementById('local_uso').value.trim() || 'Pátio / Unidade',
+                km_atual,
+                km_ultimo_oleo,
+                km_ultima_revisao
             };
 
             const { error } = await supabaseClient.from('veiculos').upsert([dados]);
-            if (error) mostrarMsg('Erro ao salvar: ' + error.message, 'erro');
-            else { mostrarMsg('Viatura salva com sucesso!'); limparFormularioVeiculo(); carregarTudo(); }
+            if (error) {
+                mostrarMsg('Erro ao salvar viatura: ' + error.message, 'erro');
+            } else {
+                mostrarMsg('Viatura salva com sucesso!');
+                limparFormularioVeiculo();
+                carregarTudo();
+            }
         }
 
         function prepararEdicao(placa, prefixo, modelo, unidade, combustivel, status, km, oleo, rev, local) {
             document.getElementById('placa').value = placa;
-            document.getElementById('placa').disabled = true; // Impede alterar a placa para não duplicar
+            document.getElementById('placa').disabled = true;
             document.getElementById('prefixo').value = prefixo;
             document.getElementById('modelo').value = modelo;
             document.getElementById('unidade').value = unidade;
@@ -454,14 +437,16 @@
         }
 
         async function deletarVeiculo(placa) {
-            if (confirm(`Atenção: Deseja realmente excluir a viatura ${placa} e todo o seu histórico de abastecimento, checklist e diário?`)) {
+            if (confirm(`ATENÇÃO: Deseja realmente excluir a viatura ${placa}?`)) {
                 const { error } = await supabaseClient.from('veiculos').delete().eq('placa', placa);
-                if (error) mostrarMsg('Não foi possível excluir: ' + error.message + ' (Verifique o Passo 1 do SQL)', 'erro');
-                else { mostrarMsg('Viatura e histórico excluídos com sucesso!'); limparFormularioVeiculo(); carregarTudo(); }
+                if (error) mostrarMsg('Erro ao excluir. O banco não permite apagar viaturas com histórico.', 'erro');
+                else { mostrarMsg(`Viatura ${placa} excluída com sucesso!`); limparFormularioVeiculo(); carregarTudo(); }
             }
         }
 
-        // === DIÁRIO DE BORDO CORRIGIDO ===
+        // ==========================
+        // MÓDULO: DIÁRIO DE BORDO
+        // ==========================
         function atualizarKmSaida() {
             const placa = document.getElementById('diario-saida-placa').value;
             const v = listaVeiculos.find(item => item.placa === placa);
@@ -518,19 +503,17 @@
 
             if (km_final <= 0 || km_final < km_ini) return mostrarMsg('O KM Final deve ser maior ou igual ao KM inicial!', 'erro');
 
-            // 1. Atualiza o diário para Encerrada usando o ID numérico exato
             const { error: errDiario } = await supabaseClient.from('diario_bordo')
                 .update({ km_final, km_rodado, status_viagem: 'Encerrada', data_retorno: new Date().toISOString() })
                 .eq('id', parseInt(idViagemStr));
 
             if (errDiario) return mostrarMsg('Erro ao atualizar diário: ' + errDiario.message, 'erro');
 
-            // 2. Atualiza a viatura para Disponível no Pátio
             const { error: errVtr } = await supabaseClient.from('veiculos')
                 .update({ km_atual: km_final, status: 'Disponível', local_uso: 'Pátio / Unidade' })
                 .eq('placa', viagem.placa);
 
-            if (errVtr) return mostrarMsg('Diário salvo, mas falha ao atualizar viatura: ' + errVtr.message, 'erro');
+            if (errVtr) return mostrarMsg('Falha ao atualizar viatura: ' + errVtr.message, 'erro');
 
             mostrarMsg(`Sucesso! Missão de ${viagem.placa} encerrada e retornada ao Pátio.`);
             document.getElementById('diario-retorno-km-fim').value = '';
@@ -565,6 +548,9 @@
             }
         }
 
+        // ==========================
+        // MÓDULOS GERAIS
+        // ==========================
         function preencherSelects() {
             const selSaida = document.getElementById('diario-saida-placa');
             if (selSaida) {
@@ -582,18 +568,171 @@
                 }
             });
         }
-        
-        async function salvarChecklist() { /* Lógica mantida idêntica para o Checklist */ }
-        async function carregarChecklists() { /* ... */ }
-        function exportarParaCSV(nome, cabecalhos, linhas) { /* ... */ }
-        function baixarRelatorioChecklist() { /* ... */ }
-        function baixarRelatorioDiario() { /* ... */ }
-        function processarColagem() { /* ... */ }
-        async function salvarLotePlanilha() { /* ... */ }
-        async function salvarAbastecimento() { /* ... */ }
-        async function carregarAbastecimentos() { /* ... */ }
-        async function salvarManutencao() { /* ... */ }
-        async function carregarManutencoes() { /* ... */ }
+
+        async function salvarChecklist() {
+            const placa = document.getElementById('chk-placa').value;
+            const motorista = document.getElementById('chk-motorista').value.trim();
+            const destino = document.getElementById('chk-destino').value.trim() || 'Em Operação';
+            if (!motorista) return mostrarMsg('Informe o nome do motorista!', 'erro');
+
+            const dados = {
+                placa, motorista, destino,
+                km_saida: parseInt(document.getElementById('chk-km').value) || 0,
+                pneus: document.getElementById('chk-pneus').value === 'true',
+                oleo_fluidos: document.getElementById('chk-oleo').value === 'true',
+                sinalizacao: document.getElementById('chk-sinalizacao').value === 'true',
+                freios: document.getElementById('chk-freios').value === 'true',
+                avarias: document.getElementById('chk-avarias').value.trim()
+            };
+
+            const { error } = await supabaseClient.from('checklists_viagem').insert([dados]);
+            if (error) mostrarMsg('Erro ao gravar checklist: ' + error.message, 'erro');
+            else {
+                mostrarMsg('Checklist salvo!');
+                document.getElementById('chk-motorista').value = '';
+                document.getElementById('chk-destino').value = '';
+                document.getElementById('chk-km').value = '';
+                document.getElementById('chk-avarias').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarChecklists() {
+            const { data } = await supabaseClient.from('checklists_viagem').select('*').order('data_checklist', { ascending: false }).limit(50);
+            cacheChecklists = data || [];
+            const tbody = document.querySelector('#tabela-checklists tbody');
+            if (!tbody) return; tbody.innerHTML = '';
+            cacheChecklists.forEach(c => {
+                const statusStr = `Pneus:${c.pneus?'OK':'X'} | Óleo:${c.oleo_fluidos?'OK':'X'} | Luzes:${c.sinalizacao?'OK':'X'} | Freios:${c.freios?'OK':'X'}`;
+                tbody.innerHTML += `<tr><td>${new Date(c.data_checklist).toLocaleString('pt-BR')}</td><td><strong>${c.placa}</strong></td><td>${c.motorista}</td><td>${c.destino || '-'}</td><td>${c.km_saida ? c.km_saida + ' km' : '-'}</td><td>${statusStr}</td><td>${c.avarias || '-'}</td></tr>`;
+            });
+        }
+
+        async function salvarAbastecimento() {
+            const placa = document.getElementById('abast-placa').value;
+            const litros = parseFloat(document.getElementById('abast-litros').value) || 0;
+            const valor_total = parseFloat(document.getElementById('abast-valor').value) || 0;
+            const km_atual = parseInt(document.getElementById('abast-km').value) || 0;
+            if (!placa || valor_total <= 0) return mostrarMsg('Informe a viatura e o valor!', 'erro');
+
+            const { error } = await supabaseClient.from('abastecimentos').insert([{ placa, litros, valor_total, km_atual }]);
+            if (error) mostrarMsg('Erro: ' + error.message, 'erro');
+            else {
+                if (km_atual > 0) await supabaseClient.from('veiculos').update({ km_atual }).eq('placa', placa);
+                mostrarMsg('Abastecimento registrado!');
+                document.getElementById('abast-litros').value = ''; document.getElementById('abast-valor').value = ''; document.getElementById('abast-km').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarAbastecimentos() {
+            const { data } = await supabaseClient.from('abastecimentos').select('*').order('data_abastecimento', { ascending: false }).limit(10);
+            const tbody = document.querySelector('#tabela-abastecimentos tbody');
+            if(!tbody) return; tbody.innerHTML = '';
+            if (data) data.forEach(a => { tbody.innerHTML += `<tr><td>${new Date(a.data_abastecimento).toLocaleDateString('pt-BR')}</td><td><strong>${a.placa}</strong></td><td>${a.litros} L</td><td>R$ ${parseFloat(a.valor_total).toFixed(2)}</td><td>${a.km_atual || '-'} km</td></tr>`; });
+        }
+
+        async function salvarManutencao() {
+            const placa = document.getElementById('man-placa').value;
+            const tipo = document.getElementById('man-tipo').value;
+            const km_execucao = parseInt(document.getElementById('man-km').value) || 0;
+            const valor = parseFloat(document.getElementById('man-valor').value) || 0;
+            const descricao = document.getElementById('man-desc').value.trim();
+
+            if (!descricao || km_execucao <= 0) return mostrarMsg('Preencha a descrição e o KM!', 'erro');
+            const { error } = await supabaseClient.from('historico_manutencoes').insert([{ placa, tipo, km_execucao, valor, descricao }]);
+            if (error) return mostrarMsg('Erro: ' + error.message, 'erro');
+
+            const upd = { km_atual: km_execucao };
+            if (tipo === 'Troca de Óleo') upd.km_ultimo_oleo = km_execucao;
+            if (tipo === 'Revisão Geral') { upd.km_ultima_revisao = km_execucao; upd.km_ultimo_oleo = km_execucao; }
+
+            await supabaseClient.from('veiculos').update(upd).eq('placa', placa);
+            mostrarMsg('Manutenção registrada!');
+            document.getElementById('man-km').value = ''; document.getElementById('man-valor').value = ''; document.getElementById('man-desc').value = '';
+            carregarTudo();
+        }
+
+        async function carregarManutencoes() {
+            const { data } = await supabaseClient.from('historico_manutencoes').select('*').order('data_manutencao', { ascending: false }).limit(10);
+            const tbody = document.querySelector('#tabela-manutencoes tbody');
+            if(!tbody) return; tbody.innerHTML = '';
+            if (data) data.forEach(m => {
+                const cor = m.tipo.includes('Corretiva') ? 'badge-err' : 'badge-ok';
+                tbody.innerHTML += `<tr><td>${new Date(m.data_manutencao).toLocaleDateString('pt-BR')}</td><td><strong>${m.placa}</strong></td><td><span class="badge ${cor}">${m.tipo}</span></td><td>${m.descricao}</td><td>${m.km_execucao || '-'} km</td><td>R$ ${parseFloat(m.valor || 0).toFixed(2)}</td></tr>`;
+            });
+        }
+
+        function exportarParaCSV(nome, cabecalhos, linhas) {
+            let csv = '\uFEFF' + cabecalhos.join(';') + '\r\n';
+            linhas.forEach(linha => {
+                csv += linha.map(item => {
+                    let str = (item === null || item === undefined) ? '' : String(item);
+                    return (str.includes(';') || str.includes('"') || str.includes('\n')) ? `"${str.replace(/"/g, '""')}"` : str;
+                }).join(';') + '\r\n';
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.download = `${nome}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function baixarRelatorioChecklist() {
+            if (!cacheChecklists.length) return mostrarMsg('Nenhum registro!', 'erro');
+            exportarParaCSV('Checklists', ['Data', 'Placa', 'Motorista', 'Destino', 'KM Saida', 'Pneus', 'Oleo/Fluidos', 'Luzes', 'Freios', 'Avarias'], cacheChecklists.map(c => [
+                new Date(c.data_checklist).toLocaleString('pt-BR'), c.placa, c.motorista, c.destino||'', c.km_saida||0, c.pneus?'OK':'X', c.oleo_fluidos?'OK':'X', c.sinalizacao?'OK':'X', c.freios?'OK':'X', c.avarias||''
+            ]));
+        }
+
+        function baixarRelatorioDiario() {
+            if (!cacheDiario.length) return mostrarMsg('Nenhum registro!', 'erro');
+            exportarParaCSV('Diario_Bordo', ['Data', 'Placa', 'Motorista', 'Destino', 'KM Inicial', 'KM Final', 'KM Rodado', 'Status'], cacheDiario.map(d => [
+                new Date(d.data).toLocaleDateString('pt-BR'), d.placa, d.motorista, d.destino, d.km_inicial||0, d.km_final||'Pendente', d.km_rodado||0, d.status_viagem||'Encerrada'
+            ]));
+        }
+
+        function processarColagem() {
+            const rawText = document.getElementById('paste-area').value.trim();
+            if (!rawText) {
+                document.getElementById('container-preview').style.display = 'none';
+                document.getElementById('btn-importar-todos').style.display = 'none';
+                document.getElementById('count-preview').innerText = '0';
+                veiculosParaImportar = [];
+                return;
+            }
+            veiculosParaImportar = [];
+            const tbody = document.querySelector('#tabela-preview tbody'); tbody.innerHTML = '';
+            rawText.split(/\r?\n/).forEach((linha, idx) => {
+                const colunas = linha.split(/\t|;/).map(c => c.trim());
+                if (colunas.length < 2) return;
+                if (idx === 0 && (colunas[0].toLowerCase().includes('placa') || colunas[1].toLowerCase().includes('modelo'))) return;
+                const placa = (colunas[0] || '').toUpperCase();
+                const modelo = colunas[2] || '';
+                if (placa && modelo) {
+                    const km_atual = parseInt(colunas[5]) || 0;
+                    veiculosParaImportar.push({
+                        placa, prefixo: colunas[1] || '', modelo, unidade: colunas[3] || '', combustivel: colunas[4] || 'Flex',
+                        km_atual, km_ultimo_oleo: km_atual, km_ultima_revisao: km_atual, status: 'Disponível', local_uso: 'Pátio / Unidade'
+                    });
+                    tbody.innerHTML += `<tr><td><strong>${placa}</strong></td><td>${modelo}</td><td>${km_atual} km</td></tr>`;
+                }
+            });
+            document.getElementById('count-preview').innerText = veiculosParaImportar.length;
+            if (veiculosParaImportar.length > 0) {
+                document.getElementById('container-preview').style.display = 'block';
+                document.getElementById('btn-importar-todos').style.display = 'inline-block';
+            }
+        }
+
+        async function salvarLotePlanilha() {
+            if (!veiculosParaImportar.length) return;
+            const { error } = await supabaseClient.from('veiculos').upsert(veiculosParaImportar);
+            if (error) mostrarMsg('Erro ao importar: ' + error.message, 'erro');
+            else {
+                mostrarMsg(`${veiculosParaImportar.length} importadas!`);
+                document.getElementById('paste-area').value = ''; processarColagem(); carregarTudo();
+            }
+        }
 
         carregarTudo();
     </script>
