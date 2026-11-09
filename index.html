@@ -11,133 +11,343 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-    <div id="app" class="max-w-7xl mx-auto p-4 sm:p-6">
-        <header class="flex flex-col sm:flex-row justify-between items-center pb-6 mb-6 border-b border-slate-800 gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2.5 rounded-xl">
-                    <i data-lucide="truck" class="w-7 h-7 text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight">FrotaPro</h1>
-                    <p class="text-sm text-slate-400">Sistema de Gestão e Controle Operacional</p>
-                </div>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0f172a] border-r border-slate-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <!-- Logo / Header -->
+            <div class="p-6 flex items-center gap-3 border-b border-slate-800/60">
+                <div class="bg-blue-600 text-white font-bold p-2 rounded-xl text-sm flex items-center justify-center shadow-lg shadow-blue-600/30">FP</div>
+                <span class="text-xl font-bold tracking-tight text-white">FrotaPro</span>
             </div>
-            <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 text-xs font-medium border border-slate-700">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                <span>Conectando ao Supabase...</span>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"><span></span></i> Dashboard
+                </button>
+                <button onclick="switchTab('vehicles')" id="nav-vehicles" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="car" class="w-5 h-5"><span></span></i> Veículos / Viaturas
+                </button>
+                <button onclick="switchTab('logbook')" id="nav-logbook" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="book-open" class="w-5 h-5"><span></span></i> Diário de Bordo
+                </button>
+                <button onclick="switchTab('checklist')" id="nav-checklist" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="check-square" class="w-5 h-5"><span></span></i> Checklist Saída
+                </button>
+                <button onclick="switchTab('import')" id="nav-import" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all">
+                    <i data-lucide="upload" class="w-5 h-5"><span></span></i> Importar Planilha
+                </button>
+                <button onclick="switchTab('refuel')" id="nav-refuel" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="fuel" class="w-5 h-5"><span></span></i> Abastecimentos
+                </button>
+                <button onclick="switchTab('maintenance')" id="nav-maintenance" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                    <i data-lucide="wrench" class="w-5 h-5"><span></span></i> Manutenções
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
+            <span>FrotaPro v2.4</span>
+            <span id="connection-indicator" class="w-2.5 h-2.5 rounded-full bg-amber-500" title="A verificar conexão..."></span>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <!-- Top Mobile Header -->
+        <header class="md:hidden flex items-center justify-between p-4 bg-[#0f172a] border-b border-slate-800">
+            <div class="flex items-center gap-2">
+                <div class="bg-blue-600 text-white font-bold p-1.5 rounded-lg text-xs">FP</div>
+                <span class="font-bold">FrotaPro</span>
             </div>
+            <select onchange="switchTab(this.value)" class="bg-slate-800 text-sm border border-slate-700 rounded-lg p-1.5 text-slate-200">
+                <option value="dashboard">Dashboard</option>
+                <option value="vehicles">Veículos / Viaturas</option>
+                <option value="logbook">Diário de Bordo</option>
+                <option value="checklist">Checklist Saída</option>
+                <option value="import" selected>Importar Planilha</option>
+                <option value="refuel">Abastecimentos</option>
+                <option value="maintenance">Manutenções</option>
+            </select>
         </header>
 
-        <!-- Main Dashboard Content -->
-        <main class="space-y-6">
+        <!-- View: Dashboard -->
+        <div id="view-dashboard" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Dashboard Operacional</h1>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
-                    <div class="text-slate-400 text-sm font-medium">Veículos Cadastrados</div>
-                    <div id="total-vehicles" class="text-3xl font-bold mt-1 text-blue-400">0</div>
+                <div class="bg-[#1e293b]/50 border border-slate-800 p-5 rounded-2xl">
+                    <span class="text-sm text-slate-400 font-medium">Veículos Cadastrados</span>
+                    <div id="dash-total-vehicles" class="text-3xl font-bold mt-2 text-blue-400">0</div>
                 </div>
-                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
-                    <div class="text-slate-400 text-sm font-medium">Manutenções Pendentes</div>
-                    <div id="total-maintenances" class="text-3xl font-bold mt-1 text-amber-400">0</div>
+                <div class="bg-[#1e293b]/50 border border-slate-800 p-5 rounded-2xl">
+                    <span class="text-sm text-slate-400 font-medium">Unidades Monitoradas</span>
+                    <div id="dash-total-units" class="text-3xl font-bold mt-2 text-emerald-400">0</div>
                 </div>
-                <div class="bg-slate-800/50 border border-slate-800 p-4 rounded-xl">
-                    <div class="text-slate-400 text-sm font-medium">Status Operacional</div>
-                    <div class="text-3xl font-bold mt-1 text-emerald-400">Normal</div>
+                <div class="bg-[#1e293b]/50 border border-slate-800 p-5 rounded-2xl">
+                    <span class="text-sm text-slate-400 font-medium">Status da Frota</span>
+                    <div class="text-3xl font-bold mt-2 text-indigo-400">Operacional</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Vehicles Table Section -->
-            <div class="bg-slate-800/30 border border-slate-800 rounded-xl overflow-hidden">
-                <div class="p-4 sm:p-6 border-b border-slate-800 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <i data-lucide="car" class="w-5 h-5 text-blue-400"></i> Frota Ativa
-                    </h2>
-                    <span class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">Atualizado em tempo real</span>
-                </div>
+        <!-- View: Veículos -->
+        <div id="view-vehicles" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Veículos / Viaturas</h1>
+            <div class="bg-[#1e293b]/30 border border-slate-800 rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider bg-slate-900/50">
-                                <th class="p-4">Prefixo / Identificação</th>
-                                <th class="p-4">Modelo</th>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase bg-slate-900/50">
                                 <th class="p-4">Placa</th>
-                                <th class="p-4">Quilometragem</th>
-                                <th class="p-4">Status</th>
+                                <th class="p-4">Prefixo</th>
+                                <th class="p-4">Modelo</th>
+                                <th class="p-4">Unidade</th>
+                                <th class="p-4">Combustível</th>
+                                <th class="p-4">KM Atual</th>
                             </tr>
                         </thead>
-                        <tbody id="vehicles-table-body" class="divide-y divide-slate-800 text-sm">
-                            <tr>
-                                <td colspan="5" class="p-6 text-center text-slate-500">Carregando dados da frota...</td>
-                            </tr>
+                        <tbody id="vehicles-table-body" class="divide-y divide-slate-800/60 text-sm">
+                            <tr><td colspan="6" class="p-6 text-center text-slate-500">A carregar veículos...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
 
-    <!-- Script de Inicialização e Lógica -->
+        <!-- View: Diário de Bordo -->
+        <div id="view-logbook" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Diário de Bordo</h1>
+            <p class="text-sm text-slate-400">Registo de saída e entrada de viaturas em serviço.</p>
+        </div>
+
+        <!-- View: Checklist Saída -->
+        <div id="view-checklist" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Checklist de Saída</h1>
+            <p class="text-sm text-slate-400">Inspeção prévia de itens obrigatórios antes da operação.</p>
+        </div>
+
+        <!-- View: Importar Planilha (Fiel à Imagem) -->
+        <div id="view-import" class="p-6 space-y-6">
+            <h1 class="text-2xl font-bold tracking-tight">Importar Lote</h1>
+            
+            <!-- Instruction Banner -->
+            <div class="bg-[#1e293b] border border-slate-800 rounded-xl p-4 flex items-start gap-3 text-sm text-slate-300">
+                <i data-lucide="info" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"><span></span></i>
+                <div>
+                    Cole abaixo os dados copiados do Excel ou LibreOffice na ordem: 
+                    <strong class="text-white">PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL</strong>
+                </div>
+            </div>
+
+            <!-- Textarea for bulk paste -->
+            <div class="space-y-2">
+                <textarea id="import-textarea" rows="8" placeholder="Cole aqui..." oninput="handleBulkPasteInput()" class="w-full bg-[#1e293b]/40 border border-slate-800 focus:border-blue-500 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none font-mono text-sm transition-all shadow-inner"></textarea>
+            </div>
+
+            <!-- Status & Action Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#1e293b]/30 p-4 rounded-xl border border-slate-800">
+                <div class="text-sm font-medium text-slate-300">
+                    Detectados: <span id="detected-count" class="text-blue-400 font-bold text-base">0</span> registos válidos
+                </div>
+                <button onclick="processBulkImport()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"><span></span></i> Importar para o Supabase
+                </button>
+            </div>
+
+            <!-- Preview Table of parsed rows -->
+            <div id="preview-container" class="hidden space-y-3">
+                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Pré-visualização dos Dados</h3>
+                <div class="bg-[#1e293b]/30 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-xs font-mono">
+                        <thead>
+                            <tr class="bg-slate-900/50 text-slate-400 border-b border-slate-800">
+                                <th class="p-3">Placa</th>
+                                <th class="p-3">Prefixo</th>
+                                <th class="p-3">Modelo</th>
+                                <th class="p-3">Unidade</th>
+                                <th class="p-3">Combustível</th>
+                                <th class="p-3">KM Atual</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preview-tbody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Abastecimentos -->
+        <div id="view-refuel" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Controle de Abastecimentos</h1>
+            <p class="text-sm text-slate-400">Registo de consumo de combustível e cálculo de médias.</p>
+        </div>
+
+        <!-- View: Manutenções -->
+        <div id="view-maintenance" class="p-6 space-y-6 hidden">
+            <h1 class="text-2xl font-bold tracking-tight">Gestão de Manutenções</h1>
+            <p class="text-sm text-slate-400">Controlo de manutenções preventivas e corretivas da frota.</p>
+        </div>
+    </main>
+
+    <!-- Script de Gestão e Conexão Supabase -->
     <script>
         lucide.createIcons();
 
-        // Configuração do Supabase (utiliza variáveis injetadas ou fallback seguro)
+        // Configuração segura do Supabase (lê das variáveis globais injetadas ou usa placeholders)
         const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'https://lphbqipxqcuunoomwxpw.supabase.co';
         const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
 
         let supabaseClient = null;
+        let parsedRowsCache = [];
 
         try {
-            if (window.supabase) {
+            if (window.supabase && SUPABASE_URL !== 'SUA_SUPABASE_URL') {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                checkConnection();
-            }
-        } catch (err) {
-            console.error("Erro ao iniciar Supabase:", err);
-            updateStatus(false, "Erro de inicialização");
-        }
-
-        function updateStatus(success, message) {
-            const statusEl = document.getElementById('connection-status');
-            if (success) {
-                statusEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-emerald-400">Conectado ao Supabase</span>`;
+                testConnection();
             } else {
-                statusEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span class="text-rose-400">${message}</span>`;
+                updateConnectionIndicator(false, "Modo Offline / Configure as chaves");
             }
+        } catch (e) {
+            updateConnectionIndicator(false, "Erro ao iniciar Supabase");
         }
 
-        async function checkConnection() {
+        function updateConnectionIndicator(success, text) {
+            const ind = document.getElementById('connection-indicator');
+            ind.className = `w-2.5 h-2.5 rounded-full ${success ? 'bg-emerald-500' : 'bg-rose-500'}`;
+            ind.title = text;
+        }
+
+        async function testConnection() {
             try {
-                const { data, error } = await supabaseClient.from('vehicles').select('*').limit(1);
+                const { error } = await supabaseClient.from('vehicles').select('*').limit(1);
                 if (error) throw error;
-                updateStatus(true);
-                loadDashboardData();
-            } catch (e) {
-                console.warn("Aviso de conexão/tabela:", e.message);
-                updateStatus(true, "Conectado (Verifique as tabelas)");
+                updateConnectionIndicator(true, "Conectado ao Supabase com sucesso");
+                loadVehicles();
+            } catch (err) {
+                updateConnectionIndicator(true, "Conectado (Verifique a tabela vehicles)");
             }
         }
 
-        async function loadDashboardData() {
+        // Navegação por Abas
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'vehicles', 'logbook', 'checklist', 'import', 'refuel', 'maintenance'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                if (el) el.classList.add('hidden');
+                const nav = document.getElementById(`nav-${t}`);
+                if (nav) {
+                    nav.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all";
+                }
+            });
+
+            const activeEl = document.getElementById(`view-${tabId}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition-all";
+            }
+
+            if (tabId === 'vehicles') {
+                loadVehicles();
+            }
+        }
+
+        // Motor de Parsing para Importação em Lote (Excel / LibreOffice tabulação)
+        function handleBulkPasteInput() {
+            const text = document.getElementById('import-textarea').value;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            parsedRowsCache = [];
+
+            lines.forEach(line => {
+                // Suporta separação por Tab (copiado do Excel/Calc) ou ponto e vírgula
+                const cols = line.split(/\t|;/).map(c => c.trim());
+                if (cols.length >= 1 && cols[0] !== '') {
+                    parsedRowsCache.push({
+                        plate: cols[0] || '',
+                        prefix: cols[1] || '',
+                        model: cols[2] || '',
+                        unit: cols[3] || '',
+                        fuel: cols[4] || '',
+                        mileage: parseInt(cols[5]?.replace(/\D/g, '')) || 0
+                    });
+                }
+            });
+
+            document.getElementById('detected-count').innerText = parsedRowsCache.length;
+            
+            const previewContainer = document.getElementById('preview-container');
+            const previewTbody = document.getElementById('preview-tbody');
+
+            if (parsedRowsCache.length > 0) {
+                previewContainer.classList.remove('hidden');
+                previewTbody.innerHTML = parsedRowsCache.map(r => `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-3 font-bold text-white">${r.plate}</td>
+                        <td class="p-3">${r.prefix}</td>
+                        <td class="p-3 text-slate-300">${r.model}</td>
+                        <td class="p-3 text-slate-400">${r.unit}</td>
+                        <td class="p-3">${r.fuel}</td>
+                        <td class="p-3">${r.mileage} km</td>
+                    </tr>
+                `).join('');
+            } else {
+                previewContainer.classList.add('hidden');
+            }
+        }
+
+        async function processBulkImport() {
+            if (parsedRowsCache.length === 0) {
+                alert('Nenhum dado válido detetado para importar.');
+                return;
+            }
+
+            if (!supabaseClient) {
+                alert('Supabase não inicializado. Verifique as credenciais.');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.from('vehicles').insert(parsedRowsCache);
+                if (error) throw error;
+
+                alert(`Com sucesso! ${parsedRowsCache.length} registos importados para a base de dados.`);
+                document.getElementById('import-textarea').value = '';
+                parsedRowsCache = [];
+                document.getElementById('detected-count').innerText = '0';
+                document.getElementById('preview-container').classList.add('hidden');
+                switchTab('vehicles');
+            } catch (err) {
+                alert('Erro ao importar para o Supabase: ' + err.message);
+            }
+        }
+
+        async function loadVehicles() {
             if (!supabaseClient) return;
             try {
-                const { data: vehicles, error } = await supabaseClient.from('vehicles').select('*');
+                const { data, error } = await supabaseClient.from('vehicles').select('*');
                 if (error) throw error;
 
-                document.getElementById('total-vehicles').innerText = vehicles ? vehicles.length : 0;
+                document.getElementById('dash-total-vehicles').innerText = data ? data.length : 0;
                 
+                const uniqueUnits = new Set(data?.map(v => v.unit).filter(Boolean));
+                document.getElementById('dash-total-units').innerText = uniqueUnits.size;
+
                 const tbody = document.getElementById('vehicles-table-body');
-                if (!vehicles || vehicles.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhum veículo cadastrado no banco de dados.</td></tr>`;
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Nenhum veículo registado. Utilize a aba "Importar Planilha".</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = vehicles.map(v => `
+                tbody.innerHTML = data.map(v => `
                     <tr class="hover:bg-slate-800/40 transition-colors">
-                        <td class="p-4 font-medium">${v.prefix || v.nome || 'N/A'}</td>
-                        <td class="p-4 text-slate-300">${v.model || v.modelo || 'N/A'}</td>
-                        <td class="p-4 font-mono text-xs text-slate-400">${v.plate || v.placa || 'N/A'}</td>
-                        <td class="p-4">${v.mileage || v.quilometragem || 0} km</td>
-                        <td class="p-4"><span class="px-2.5 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Operacional</span></td>
+                        <td class="p-4 font-mono font-bold text-white">${v.plate || 'N/A'}</td>
+                        <td class="p-4 font-medium">${v.prefix || 'N/A'}</td>
+                        <td class="p-4 text-slate-300">${v.model || 'N/A'}</td>
+                        <td class="p-4 text-slate-400">${v.unit || 'N/A'}</td>
+                        <td class="p-4">${v.fuel || 'N/A'}</td>
+                        <td class="p-4">${v.mileage || 0} km</td>
                     </tr>
                 `).join('');
             } catch (err) {
