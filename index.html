@@ -12,8 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0a0e14',
-                        sidebarBg: '#111827',
+                        darkBg: '#080c14',
+                        sidebarBg: '#0f172a',
+                        cardBg: '#131b2e',
+                        accentBlue: '#2563eb'
                     }
                 }
             }
@@ -21,13 +23,18 @@
     </script>
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-[#0a0e14] text-slate-100 font-sans h-screen overflow-hidden flex flex-col">
+<body class="bg-[#080c14] text-slate-100 font-sans h-screen overflow-hidden flex flex-col">
 
     <!-- Notification Modal Box -->
-    <div id="notificationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 hidden">
-        <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
-            <div class="flex items-center space-x-3 mb-4">
+    <div id="notificationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 hidden">
+        <div class="w-full max-w-md bg-[#131b2e] border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
+            <div class="flex items-center space-x-3 mb-3">
                 <div id="notifIcon" class="p-2 rounded-xl bg-blue-500/20 text-blue-400">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
@@ -35,7 +42,7 @@
             </div>
             <p id="notifMessage" class="text-slate-300 mb-6 text-sm leading-relaxed">Mensagem aqui...</p>
             <div class="flex justify-end">
-                <button onclick="closeNotification()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all shadow-lg shadow-blue-600/30">
+                <button onclick="closeNotification()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/30">
                     Entendido
                 </button>
             </div>
@@ -44,10 +51,10 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-sidebarBg border-r border-slate-800 flex flex-col justify-between shrink-0 select-none shadow-xl">
+        <aside class="w-64 md:w-68 bg-sidebarBg border-r border-slate-800/80 flex flex-col justify-between shrink-0 select-none shadow-2xl overflow-y-auto">
             <div>
-                <div class="p-6 flex items-center space-x-3 border-b border-slate-800/80">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-600/40 text-lg">
+                <div class="p-6 flex items-center space-x-3 border-b border-slate-800/60">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-600/40 text-xl tracking-wider">
                         FP
                     </div>
                     <div>
@@ -73,9 +80,9 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         <span>Checklist Saída</span>
                     </button>
-                    <button onclick="switchTab('importar')" data-tab="importar" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span>Importar Planilha</span>
+                    <button onclick="switchTab('copiarPlanilha')" data-tab="copiarPlanilha" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                        <span>Colar de Planilha</span>
                     </button>
                     <button onclick="switchTab('abastecimentos')" data-tab="abastecimentos" class="nav-btn w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -88,8 +95,8 @@
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-                <button onclick="openConfigModal()" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-xs transition-all">
+            <div class="p-4 border-t border-slate-800/80 bg-slate-900/40">
+                <button onclick="openConfigModal()" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/60 text-xs transition-all shadow-inner">
                     <div class="flex items-center space-x-2">
                         <span id="dbIndicator" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
                         <span id="dbIndicatorText" class="font-semibold text-slate-200">Modo Simulação</span>
@@ -100,41 +107,41 @@
         </aside>
 
         <!-- MAIN VIEW -->
-        <main class="flex-1 flex flex-col overflow-hidden bg-[#0a0e14]">
-            <header class="h-20 bg-sidebarBg/80 backdrop-blur-md border-b border-slate-800 px-8 flex items-center justify-between shrink-0">
+        <main class="flex-1 flex flex-col overflow-hidden bg-[#080c14]">
+            <header class="h-20 bg-sidebarBg/90 backdrop-blur-md border-b border-slate-800 px-8 flex items-center justify-between shrink-0 shadow-lg">
                 <h2 id="pageTitle" class="text-xl font-bold tracking-tight text-white">Dashboard Operacional</h2>
                 <div id="actionButtonContainer"></div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-8" id="mainContent"></div>
+            <div class="flex-1 overflow-y-auto p-4 md:p-8" id="mainContent"></div>
         </main>
     </div>
 
     <!-- CONFIG MODAL -->
-    <div id="configModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 hidden">
-        <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+    <div id="configModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 hidden">
+        <div class="w-full max-w-lg bg-[#131b2e] border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-2">Configuração do Supabase</h3>
-            <p class="text-xs text-slate-400 mb-6">Insira a URL e a Chave Pública (Anon Key) do seu projeto no Supabase.</p>
+            <p class="text-xs text-slate-400 mb-6">Insira a URL e a Chave Pública (Anon Key) do seu projeto no Supabase para salvar online.</p>
             <form onsubmit="saveConfig(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Supabase URL</label>
-                    <input id="inputUrl" type="text" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="https://xyz.supabase.co" />
+                    <input id="inputUrl" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="https://xyz.supabase.co" />
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Supabase Anon Key</label>
-                    <input id="inputKey" type="password" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="eyJhbGciOi..." />
+                    <input id="inputKey" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="eyJhbGciOi..." />
                 </div>
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" onclick="closeConfigModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Cancelar</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm shadow-lg shadow-blue-600/30">Salvar Conexão</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm shadow-lg shadow-blue-600/30 font-semibold">Salvar Conexão</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- DYNAMIC FORM MODAL -->
-    <div id="dynamicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 hidden">
-        <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+    <div id="dynamicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 hidden">
+        <div class="w-full max-w-lg bg-[#131b2e] border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
             <h3 id="modalTitle" class="text-xl font-bold text-white mb-4">Novo Registro</h3>
             <div id="modalBody"></div>
         </div>
@@ -143,7 +150,7 @@
     <script>
         let currentTab = 'dashboard';
         let supabaseClient = null;
-        let isSimulated = true;
+        let isSimulated = false; // Real mode by default
         
         let state = {
             veiculos: [],
@@ -162,7 +169,8 @@
                 document.getElementById('inputKey').value = DEFAULT_KEY;
                 initSupabase(DEFAULT_URL, DEFAULT_KEY);
             } else {
-                loadMockData();
+                openConfigModal();
+                showNotification('Insira sua URL e Anon Key do Supabase para habilitar o salvamento definitivo online.', 'info');
                 render();
             }
         });
@@ -172,11 +180,10 @@
                 supabaseClient = window.supabase.createClient(url, key);
                 isSimulated = false;
                 document.getElementById('dbIndicator').className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
-                document.getElementById('dbIndicatorText').innerText = 'Supabase Conectado';
+                document.getElementById('dbIndicatorText').innerText = 'Supabase Definitivo';
                 fetchAllData();
             } catch (err) {
-                loadMockData();
-                render();
+                showNotification('Erro ao conectar no Supabase. Verifique suas credenciais.', 'error');
             }
         }
 
@@ -191,7 +198,8 @@
                     supabaseClient.from('checklists').select('*')
                 ]);
 
-                if (v.data) state.veiculos = v.data;
+                if (v.error) throw v.error;
+                state.veiculos = v.data || [];
                 if (a.data) state.abastecimentos = a.data;
                 if (m.data) state.manutencoes = m.data;
                 if (d.data) state.diario = d.data;
@@ -199,31 +207,8 @@
 
                 render();
             } catch (err) {
-                showNotification('Erro ao buscar dados online.', 'error');
+                showNotification('Erro ao buscar dados do Supabase. Verifique se as tabelas (veiculos, abastecimentos, manutencoes, diario_bordo, checklists) foram criadas.', 'error');
             }
-        }
-
-        function loadMockData() {
-            state.veiculos = [
-                { id: '1', placa: 'ABC-1234', modelo: 'Fiat Toro', marca: 'Fiat', unidade: 'Base Norte', status: 'Disponível', ano: 2023, km: 15400 },
-                { id: '2', placa: 'XYZ-9876', modelo: 'Toyota Hilux', marca: 'Toyota', unidade: 'Base Sul', status: 'Em Rota', ano: 2022, km: 42100 },
-                { id: '3', placa: 'DEF-5678', modelo: 'Renault Duster', marca: 'Renault', unidade: 'Matriz', status: 'Manutenção', ano: 2021, km: 68900 }
-            ];
-            state.abastecimentos = [
-                { id: '1', placa: 'ABC-1234', litros: 45, valor_total: 270.0, km: 15200, posto: 'Auto Posto BR', data: '2026-06-01' }
-            ];
-            state.manutencoes = [
-                { id: '1', placa: 'DEF-5678', tipo: 'Corretiva', descricao: 'Troca de pastilhas de freio', custo: 850.0, oficina: 'Mecânica Central', data: '2026-06-03' }
-            ];
-            state.diario = [
-                { id: '1', placa: 'XYZ-9876', motorista: 'Carlos Silva', destino: 'Filial Centro', km_saida: 42000, finalidade: 'Entrega', data: '2026-06-04' }
-            ];
-            state.checklists = [
-                { id: '1', placa: 'ABC-1234', motorista: 'Ana Souza', pneus: true, freios: true, oleo: true, eletrica: true, observacoes: 'Tudo OK', data: '2026-06-04' }
-            ];
-            isSimulated = true;
-            document.getElementById('dbIndicator').className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
-            document.getElementById('dbIndicatorText').innerText = 'Modo Simulação';
         }
 
         function switchTab(tab) {
@@ -244,7 +229,7 @@
                 veiculos: 'Gerenciamento de Veículos e Viaturas',
                 diario: 'Diário de Bordo e Saídas',
                 checklist: 'Checklist de Saída de Veículos',
-                importar: 'Importação por Arraste de Arquivo (Drag & Drop)',
+                copiarPlanilha: 'Importação Rápida (Copiar e Colar de Planilha)',
                 abastecimentos: 'Controle de Abastecimentos e Combustível',
                 manutencoes: 'Gestão de Manutenções Corretivas e Preventivas'
             };
@@ -254,7 +239,7 @@
             if (['veiculos', 'abastecimentos', 'manutencoes', 'diario', 'checklist'].includes(currentTab)) {
                 const labels = { veiculos: 'Novo Veículo', abastecimentos: 'Novo Abastecimento', manutencoes: 'Nova Manutenção', diario: 'Registrar Saída', checklist: 'Novo Checklist' };
                 const modals = { veiculos: 'vehicle', abastecimentos: 'refuel', manutencoes: 'maintenance', diario: 'log', checklist: 'checklist' };
-                btnContainer.innerHTML = `<button onclick="openModal('${modals[currentTab]}')" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-blue-600/30"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg><span>${labels[currentTab]}</span></button>`;
+                btnContainer.innerHTML = `<button onclick="openModal('${modals[currentTab]}')" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-blue-600/30"><svg class="w-5 h-5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg><span>${labels[currentTab]}</span></button>`;
             } else {
                 btnContainer.innerHTML = '';
             }
@@ -265,219 +250,367 @@
                 content.innerHTML = `
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-sidebarBg border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-                                <div><span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Veículos Cadastrados</span><h3 class="text-4xl font-extrabold text-white mt-3">${state.veiculos.length}</h3></div>
-                                <div class="mt-4 text-xs text-emerald-400 font-medium">${isSimulated ? 'Simulação Local' : 'Supabase Online'}</div>
+                            <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Veículos Cadastrados</span>
+                                    <h3 class="text-4xl font-extrabold text-white mt-3">${state.veiculos.length}</h3>
+                                </div>
+                                <div class="mt-4 flex items-center text-xs text-emerald-400 font-medium">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
+                                    <span>${supabaseClient ? 'Conectado ao Supabase' : 'Aguardando Conexão'}</span>
+                                </div>
                             </div>
-                            <div class="bg-sidebarBg border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-                                <div><span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Unidades Monitoradas</span><h3 class="text-4xl font-extrabold text-white mt-3">${unidadesCount}</h3></div>
-                                <div class="mt-4 text-xs text-slate-400 font-medium">Bases Ativas</div>
+                            <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Unidades Monitoradas</span>
+                                    <h3 class="text-4xl font-extrabold text-white mt-3">${unidadesCount}</h3>
+                                </div>
+                                <div class="mt-4 text-xs text-slate-400 font-medium">Bases Operacionais Ativas</div>
                             </div>
-                            <div class="bg-sidebarBg border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-                                <div><span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status da Frota</span><h3 class="text-4xl font-extrabold text-blue-400 mt-3">Operacional</h3></div>
-                                <div class="mt-4 text-xs text-emerald-400 font-medium">100% Sistemas Ativos</div>
+                            <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status da Frota</span>
+                                    <h3 class="text-4xl font-extrabold text-blue-400 mt-3">Operacional</h3>
+                                </div>
+                                <div class="mt-4 flex items-center text-xs text-emerald-400 font-medium">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
+                                    <span>Sistemas Online</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                            <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+                                <h4 class="font-bold text-base text-white mb-4">Últimas Saídas (Diário de Bordo)</h4>
+                                <div class="space-y-3">
+                                    ${state.diario.length === 0 ? '<p class="text-xs text-slate-400">Nenhum registro encontrado.</p>' : state.diario.slice(0, 3).map(d => `
+                                        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                                            <div>
+                                                <p class="font-semibold text-sm text-white">${d.placa} • <span class="text-blue-400">${d.motorista}</span></p>
+                                                <p class="text-xs text-slate-400">Destino: ${d.destino} (${d.finalidade})</p>
+                                            </div>
+                                            <span class="text-xs font-mono text-slate-300">${d.km_saida} km</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+                                <h4 class="font-bold text-base text-white mb-4">Últimos Checklists de Saída</h4>
+                                <div class="space-y-3">
+                                    ${state.checklists.length === 0 ? '<p class="text-xs text-slate-400">Nenhum registro encontrado.</p>' : state.checklists.slice(0, 3).map(c => `
+                                        <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                                            <div>
+                                                <p class="font-semibold text-sm text-white">${c.placa} • <span class="text-emerald-400">${c.motorista}</span></p>
+                                                <p class="text-xs text-slate-400">Inspeção completa realizada</p>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">Aprovado</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                     </div>`;
             } else if (currentTab === 'veiculos') {
                 content.innerHTML = `
-                    <div class="bg-sidebarBg border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead><tr class="border-b border-slate-800 bg-slate-900/50 text-xs font-semibold text-slate-400 uppercase"><th class="p-4">Placa</th><th class="p-4">Modelo</th><th class="p-4">Unidade</th><th class="p-4">Ano</th><th class="p-4">KM</th><th class="p-4">Status</th></tr></thead>
+                    <div class="bg-cardBg border border-slate-800/80 rounded-2xl shadow-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4">Placa</th><th class="p-4">Modelo</th><th class="p-4">Unidade</th><th class="p-4">Ano</th><th class="p-4">KM</th><th class="p-4">Status</th><th class="p-4 text-right">Ações</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-slate-800/60 text-sm">
-                                ${state.veiculos.map(v => `<tr><td class="p-4 font-semibold text-white">${v.placa}</td><td class="p-4 text-slate-300">${v.marca} ${v.modelo}</td><td class="p-4 text-slate-300">${v.unidade || 'Matriz'}</td><td class="p-4 text-slate-400">${v.ano}</td><td class="p-4 text-slate-300">${v.km} km</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">${v.status}</span></td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>`;
-            } else if (currentTab === 'abastecimentos') {
-                content.innerHTML = `
-                    <div class="bg-sidebarBg border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead><tr class="border-b border-slate-800 bg-slate-900/50 text-xs font-semibold text-slate-400 uppercase"><th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Posto</th><th class="p-4">Litros</th><th class="p-4">Valor Total</th></tr></thead>
-                            <tbody class="divide-y divide-slate-800/60 text-sm">
-                                ${state.abastecimentos.map(a => `<tr><td class="p-4 text-slate-400">${a.data}</td><td class="p-4 font-semibold text-white">${a.placa}</td><td class="p-4 text-slate-300">${a.posto}</td><td class="p-4 text-slate-300">${a.litros} L</td><td class="p-4 font-bold text-emerald-400">R$ ${Number(a.valor_total).toFixed(2)}</td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>`;
-            } else if (currentTab === 'manutencoes') {
-                content.innerHTML = `
-                    <div class="bg-sidebarBg border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead><tr class="border-b border-slate-800 bg-slate-900/50 text-xs font-semibold text-slate-400 uppercase"><th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Tipo</th><th class="p-4">Oficina</th><th class="p-4">Custo</th></tr></thead>
-                            <tbody class="divide-y divide-slate-800/60 text-sm">
-                                ${state.manutencoes.map(m => `<tr><td class="p-4 text-slate-400">${m.data}</td><td class="p-4 font-semibold text-white">${m.placa}</td><td class="p-4 text-blue-400">${m.tipo}</td><td class="p-4 text-slate-300">${m.oficina}</td><td class="p-4 font-bold text-amber-400">R$ ${Number(m.custo).toFixed(2)}</td></tr>`).join('')}
+                                ${state.veiculos.length === 0 ? `<tr><td colspan="7" class="p-8 text-center text-slate-400">Nenhum veículo cadastrado no banco de dados.</td></tr>` : state.veiculos.map(v => `
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="p-4 font-semibold text-white flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>${v.placa}</span></td>
+                                        <td class="p-4 text-slate-300">${v.marca} ${v.modelo}</td>
+                                        <td class="p-4 text-slate-300">${v.unidade || 'Matriz'}</td>
+                                        <td class="p-4 text-slate-400">${v.ano}</td>
+                                        <td class="p-4 text-slate-300 font-mono">${v.km?.toLocaleString()} km</td>
+                                        <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${v.status}</span></td>
+                                        <td class="p-4 text-right space-x-2">
+                                            <button onclick="editVehicle('${v.id}')" class="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 text-xs font-medium">Editar</button>
+                                            <button onclick="deleteVehicle('${v.id}')" class="px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium">Excluir</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
                     </div>`;
             } else if (currentTab === 'diario') {
                 content.innerHTML = `
-                    <div class="bg-sidebarBg border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead><tr class="border-b border-slate-800 bg-slate-900/50 text-xs font-semibold text-slate-400 uppercase"><th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Motorista</th><th class="p-4">Destino</th><th class="p-4">Finalidade</th></tr></thead>
+                    <div class="bg-cardBg border border-slate-800/80 rounded-2xl shadow-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Motorista</th><th class="p-4">Destino</th><th class="p-4">Finalidade</th><th class="p-4">KM Saída</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-slate-800/60 text-sm">
-                                ${state.diario.map(d => `<tr><td class="p-4 text-slate-400">${d.data}</td><td class="p-4 font-semibold text-white">${d.placa}</td><td class="p-4 text-slate-300">${d.motorista}</td><td class="p-4 text-slate-300">${d.destino}</td><td class="p-4 text-slate-400">${d.finalidade}</td></tr>`).join('')}
+                                ${state.diario.length === 0 ? `<tr><td colspan="6" class="p-8 text-center text-slate-400">Nenhum registro encontrado.</td></tr>` : state.diario.map(d => `
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="p-4 text-slate-400">${d.data}</td>
+                                        <td class="p-4 font-semibold text-white">${d.placa}</td>
+                                        <td class="p-4 text-slate-300">${d.motorista}</td>
+                                        <td class="p-4 text-slate-300">${d.destino}</td>
+                                        <td class="p-4 text-slate-400">${d.finalidade}</td>
+                                        <td class="p-4 font-mono text-slate-300 flex justify-between items-center space-x-4">
+                                            <span>${d.km_saida?.toLocaleString()} km</span>
+                                            <button onclick="deleteRecord('diario_bordo', '${d.id}')" class="px-2 py-1 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium transition-all">Excluir</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
                     </div>`;
             } else if (currentTab === 'checklist') {
                 content.innerHTML = `
-                    <div class="bg-sidebarBg border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead><tr class="border-b border-slate-800 bg-slate-900/50 text-xs font-semibold text-slate-400 uppercase"><th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Motorista</th><th class="p-4">Status</th></tr></thead>
+                    <div class="bg-cardBg border border-slate-800/80 rounded-2xl shadow-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Motorista</th><th class="p-4">Pneus / Freios</th><th class="p-4">Óleo / Elétrica</th><th class="p-4">Status</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-slate-800/60 text-sm">
-                                ${state.checklists.map(c => `<tr><td class="p-4 text-slate-400">${c.data}</td><td class="p-4 font-semibold text-white">${c.placa}</td><td class="p-4 text-slate-300">${c.motorista}</td><td class="p-4 text-emerald-400 font-semibold">✔ Aprovado</td></tr>`).join('')}
+                                ${state.checklists.length === 0 ? `<tr><td colspan="6" class="p-8 text-center text-slate-400">Nenhum registro encontrado.</td></tr>` : state.checklists.map(c => `
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="p-4 text-slate-400">${c.data}</td>
+                                        <td class="p-4 font-semibold text-white">${c.placa}</td>
+                                        <td class="p-4 text-slate-300">${c.motorista}</td>
+                                        <td class="p-4 text-emerald-400 font-medium">✔ OK</td>
+                                        <td class="p-4 text-emerald-400 font-medium">✔ OK</td>
+                                        <td class="p-4 flex justify-between items-center space-x-4">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aprovado</span>
+                                            <button onclick="deleteRecord('checklists', '${c.id}')" class="px-2 py-1 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium transition-all">Excluir</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
                     </div>`;
-            } else if (currentTab === 'importar') {
+            } else if (currentTab === 'copiarPlanilha') {
                 content.innerHTML = `
-                    <div class="max-w-xl mx-auto space-y-6">
-                        <div class="bg-sidebarBg border border-slate-800 rounded-2xl p-8 shadow-xl text-center">
-                            <h3 class="text-xl font-bold text-white mb-2">Arraste seu arquivo CSV ou TXT</h3>
-                            <p class="text-sm text-slate-400 mb-6">Arraste o arquivo para a área abaixo ou clique para selecionar.</p>
-                            
-                            <div id="dropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-2xl p-10 cursor-pointer transition-all bg-slate-900/50 flex flex-col items-center justify-center space-y-3">
-                                <svg class="w-12 h-12 text-blue-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                <span class="text-sm font-semibold text-slate-200">Arraste a planilha de veículos aqui</span>
-                                <span class="text-xs text-slate-500">Formatos aceitos: .csv, .txt (Colunas: PLACA, MODELO, MARCA, UNIDADE)</span>
-                                <input type="file" id="fileInput" accept=".csv,.txt" class="hidden" onchange="handleFileSelect(event)" />
-                            </div>
+                    <div class="max-w-2xl mx-auto space-y-6">
+                        <div class="bg-cardBg border border-slate-800/80 rounded-2xl p-8 shadow-xl">
+                            <h3 class="text-xl font-bold text-white mb-2">Copiar e Colar de sua Planilha</h3>
+                            <p class="text-sm text-slate-400 mb-6">
+                                Selecione as colunas em seu Excel ou Google Sheets (Placa, Modelo, Marca, Unidade) e cole diretamente na caixa abaixo para salvar direto no Supabase.
+                            </p>
+                            <form onsubmit="handlePasteImport(event)" class="space-y-4">
+                                <textarea id="pasteInput" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-blue-500 font-mono" placeholder="ABC-1234\tFiat Toro\tFiat\tMatriz&#10;XYZ-9876\tToyota Hilux\tToyota\tBase Sul"></textarea>
+                                <button type="submit" class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/30">
+                                    Processar e Salvar no Supabase
+                                </button>
+                            </form>
                         </div>
+                    </div>`;
+            } else if (currentTab === 'abastecimentos') {
+                content.innerHTML = `
+                    <div class="bg-cardBg border border-slate-800/80 rounded-2xl shadow-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Posto</th><th class="p-4">Litros</th><th class="p-4">Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-sm">
+                                ${state.abastecimentos.length === 0 ? `<tr><td colspan="5" class="p-8 text-center text-slate-400">Nenhum registro encontrado.</td></tr>` : state.abastecimentos.map(a => `
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="p-4 text-slate-400">${a.data}</td>
+                                        <td class="p-4 font-semibold text-white">${a.placa}</td>
+                                        <td class="p-4 text-slate-300">${a.posto}</td>
+                                        <td class="p-4 text-slate-300">${a.litros} L</td>
+                                        <td class="p-4 font-bold text-emerald-400 flex justify-between items-center space-x-4">
+                                            <span>R$ ${Number(a.valor_total).toFixed(2)}</span>
+                                            <button onclick="deleteRecord('abastecimentos', '${a.id}')" class="px-2 py-1 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium transition-all">Excluir</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>`;
+            } else if (currentTab === 'manutencoes') {
+                content.innerHTML = `
+                    <div class="bg-cardBg border border-slate-800/80 rounded-2xl shadow-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-max">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4">Data</th><th class="p-4">Placa</th><th class="p-4">Tipo</th><th class="p-4">Oficina</th><th class="p-4">Custo</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-sm">
+                                ${state.manutencoes.length === 0 ? `<tr><td colspan="5" class="p-8 text-center text-slate-400">Nenhum registro encontrado.</td></tr>` : state.manutencoes.map(m => `
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="p-4 text-slate-400">${m.data}</td>
+                                        <td class="p-4 font-semibold text-white">${m.placa}</td>
+                                        <td class="p-4 text-blue-400 font-medium">${m.tipo}</td>
+                                        <td class="p-4 text-slate-300">${m.oficina}</td>
+                                        <td class="p-4 font-bold text-amber-400 flex justify-between items-center space-x-4">
+                                            <span>R$ ${Number(m.custo).toFixed(2)}</span>
+                                            <button onclick="deleteRecord('manutencoes', '${m.id}')" class="px-2 py-1 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium transition-all">Excluir</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>`;
             }
         }
 
-        function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); document.getElementById('dropZone').classList.add('border-blue-500', 'bg-blue-500/10'); }
-        function handleDragLeave(e) { e.preventDefault(); e.stopPropagation(); document.getElementById('dropZone').classList.remove('border-blue-500', 'bg-blue-500/10'); }
-        function handleFileDrop(e) {
-            e.preventDefault(); e.stopPropagation();
-            document.getElementById('dropZone').classList.remove('border-blue-500', 'bg-blue-500/10');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) processFile(files[0]);
-        }
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            if (files.length > 0) processFile(files[0]);
-        }
+        async function handlePasteImport(e) {
+            e.preventDefault();
+            const text = document.getElementById('pasteInput').value;
+            if (!text.trim()) {
+                showNotification('Cole os dados da planilha antes de salvar.', 'error');
+                return;
+            }
+            const lines = text.trim().split('\n');
+            let count = 0;
+            const newItems = [];
+            lines.forEach(line => {
+                const parts = line.split(/[\t,;]/);
+                if (parts.length >= 1 && parts[0].trim()) {
+                    newItems.push({
+                        placa: parts[0].trim().toUpperCase(),
+                        modelo: parts[1] ? parts[1].trim() : 'Genérico',
+                        marca: parts[2] ? parts[2].trim() : 'Diversos',
+                        unidade: parts[3] ? parts[3].trim() : 'Matriz',
+                        status: 'Disponível',
+                        ano: 2024,
+                        km: 1000
+                    });
+                    count++;
+                }
+            });
 
-        async function processFile(file) {
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const text = e.target.result;
-                const lines = text.trim().split('\n');
-                let count = 0;
-                const newItems = [];
-                lines.forEach(line => {
-                    const parts = line.split(/[,\t;]/);
-                    if (parts.length >= 2) {
-                        newItems.push({
-                            placa: parts[0].trim().toUpperCase(),
-                            modelo: parts[1] ? parts[1].trim() : 'Genérico',
-                            marca: parts[2] ? parts[2].trim() : 'Diversos',
-                            unidade: parts[3] ? parts[3].trim() : 'Matriz',
-                            status: 'Disponível',
-                            ano: 2024,
-                            km: 1000
-                        });
-                        count++;
-                    }
-                });
+            if (count === 0) {
+                showNotification('Nenhum dado válido encontrado.', 'error');
+                return;
+            }
 
-                if (count === 0) {
-                    showNotification('Nenhum dado válido encontrado no arquivo.', 'error');
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('veiculos').insert(newItems);
+                if (error) {
+                    showNotification('Erro ao salvar no Supabase: ' + error.message, 'error');
                     return;
                 }
+                fetchAllData();
+            } else {
+                showNotification('Conecte ao Supabase primeiro.', 'error');
+                return;
+            }
 
-                if (!isSimulated && supabaseClient) {
-                    const { error } = await supabaseClient.from('veiculos').insert(newItems);
-                    if (error) {
-                        showNotification('Erro ao importar para o Supabase: ' + error.message, 'error');
-                        return;
-                    }
-                    fetchAllData();
-                } else {
-                    const mapped = newItems.map(item => ({ id: Date.now().toString() + Math.random(), ...item }));
-                    state.veiculos.push(...mapped);
-                    render();
-                }
-
-                showNotification(`${count} veículos importados do arquivo com sucesso!`);
-            };
-            reader.readAsText(file);
+            document.getElementById('pasteInput').value = '';
+            showNotification(`${count} veículos incluídos e salvos no Supabase com sucesso!`);
         }
 
-        function openModal(type) {
+        function openModal(type, editData = null) {
             const modal = document.getElementById('dynamicModal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
             modal.classList.remove('hidden');
 
             if (type === 'vehicle') {
-                title.innerText = 'Cadastrar Novo Veículo';
+                title.innerText = editData ? 'Editar Veículo' : 'Cadastrar Novo Veículo';
                 body.innerHTML = `
-                    <form onsubmit="submitVehicle(event)" class="space-y-4">
+                    <form onsubmit="submitVehicle(event, '${editData ? editData.id : ''}')" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><input required id="vPlaca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm uppercase" placeholder="ABC-1234"/></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Modelo</label><input required id="vModelo" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Fiat Toro"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><input required id="vPlaca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm uppercase" value="${editData ? editData.placa : ''}" placeholder="ABC-1234"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Modelo</label><input required id="vModelo" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" value="${editData ? editData.modelo : ''}" placeholder="Fiat Toro"/></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Marca</label><input required id="vMarca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Fiat"/></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Unidade</label><input required id="vUnidade" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Matriz"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Marca</label><input required id="vMarca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" value="${editData ? editData.marca : ''}" placeholder="Fiat"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Unidade</label><input required id="vUnidade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" value="${editData ? editData.unidade || 'Matriz' : ''}" placeholder="Matriz"/></div>
                         </div>
-                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-4 py-2 bg-blue-600 rounded-xl text-sm font-semibold">Salvar</button></div>
+                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar Online</button></div>
                     </form>`;
             } else if (type === 'refuel') {
                 title.innerText = 'Registrar Abastecimento';
                 body.innerHTML = `
                     <form onsubmit="submitRefuel(event)" class="space-y-4">
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="rPlaca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm">${state.veiculos.map(v => `<option value="${v.placa}">${v.placa} - ${v.modelo}</option>`).join('')}</select></div>
+                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="rPlaca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="">Selecione a placa</option>${state.veiculos.map(v => `<option value="${v.placa}">${v.placa} - ${v.modelo}</option>`).join('')}</select></div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Litros</label><input required type="number" step="0.01" id="rLitros" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Valor Total (R$)</label><input required type="number" step="0.01" id="rValor" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Litros</label><input required type="number" step="0.01" id="rLitros" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Valor Total (R$)</label><input required type="number" step="0.01" id="rValor" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Posto</label><input required id="rPosto" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Auto Posto"/></div>
-                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-4 py-2 bg-blue-600 rounded-xl text-sm font-semibold">Salvar</button></div>
+                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Posto</label><input required id="rPosto" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm" placeholder="Auto Posto BR"/></div>
+                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar</button></div>
                     </form>`;
             } else if (type === 'maintenance') {
                 title.innerText = 'Registrar Manutenção';
                 body.innerHTML = `
                     <form onsubmit="submitMaint(event)" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="mPlaca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm">${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Tipo</label><select id="mTipo" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="Preventiva">Preventiva</option><option value="Corretiva">Corretiva</option></select></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="mPlaca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="">Selecione a placa</option>${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Tipo</label><select id="mTipo" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="Preventiva">Preventiva</option><option value="Corretiva">Corretiva</option></select></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Oficina</label><input required id="mOficina" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Custo (R$)</label><input required type="number" step="0.01" id="mCusto" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Oficina</label><input required id="mOficina" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Custo (R$)</label><input required type="number" step="0.01" id="mCusto" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Descrição</label><input required id="mDesc" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
-                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-4 py-2 bg-blue-600 rounded-xl text-sm font-semibold">Salvar</button></div>
+                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Descrição</label><input required id="mDesc" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar</button></div>
                     </form>`;
             } else if (type === 'log') {
                 title.innerText = 'Registrar Diário de Bordo';
                 body.innerHTML = `
                     <form onsubmit="submitLog(event)" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="lPlaca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm">${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Motorista</label><input required id="lMotorista" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="lPlaca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="">Selecione a placa</option>${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Motorista</label><input required id="lMotorista" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Destino</label><input required id="lDestino" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">KM Saída</label><input required type="number" id="lKm" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Destino</label><input required id="lDestino" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">KM Saída</label><input required type="number" id="lKm" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
-                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Finalidade</label><input required id="lFinalidade" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
-                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-4 py-2 bg-blue-600 rounded-xl text-sm font-semibold">Salvar</button></div>
+                        <div><label class="block text-xs uppercase text-slate-400 mb-1">Finalidade</label><input required id="lFinalidade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar</button></div>
                     </form>`;
             } else if (type === 'checklist') {
                 title.innerText = 'Novo Checklist de Saída';
                 body.innerHTML = `
                     <form onsubmit="submitChecklist(event)" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="cPlaca" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm">${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
-                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Motorista</label><input required id="cMotorista" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Placa</label><select required id="cPlaca" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"><option value="">Selecione a placa</option>${state.veiculos.map(v => `<option value="${v.placa}">${v.placa}</option>`).join('')}</select></div>
+                            <div><label class="block text-xs uppercase text-slate-400 mb-1">Motorista</label><input required id="cMotorista" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-sm"/></div>
                         </div>
-                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-4 py-2 bg-blue-600 rounded-xl text-sm font-semibold">Salvar</button></div>
+                        <div class="flex justify-end space-x-3 pt-4"><button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-sm">Cancelar</button><button type="submit" class="px-5 py-2 bg-blue-600 rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">Salvar</button></div>
                     </form>`;
+            }
+        }
+
+        function editVehicle(id) {
+            const v = state.veiculos.find(item => item.id == id);
+            if (v) openModal('vehicle', v);
+        }
+
+        async function deleteVehicle(id) {
+            if (!confirm('Deseja realmente excluir este veículo?')) return;
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('veiculos').delete().eq('id', id);
+                if (error) {
+                    showNotification('Erro ao excluir veículo: ' + error.message, 'error');
+                    return;
+                }
+                fetchAllData();
+                showNotification('Veículo excluído com sucesso!');
+            }
+        }
+
+        async function deleteRecord(table, id) {
+            if (!confirm('Deseja realmente excluir este registro de forma permanente?')) return;
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from(table).delete().eq('id', id);
+                if (error) {
+                    showNotification('Erro ao excluir: ' + error.message, 'error');
+                    return;
+                }
+                fetchAllData();
+                showNotification('Registro excluído com sucesso!');
+            } else {
+                showNotification('Conecte ao Supabase primeiro.', 'error');
             }
         }
 
@@ -502,7 +635,7 @@
             showNotification('Configuração salva com sucesso!');
         }
 
-        async function submitVehicle(e) {
+        async function submitVehicle(e, editId = '') {
             e.preventDefault();
             const item = {
                 placa: document.getElementById('vPlaca').value.toUpperCase(),
@@ -513,15 +646,27 @@
                 ano: 2024,
                 km: 1000
             };
-            if (!isSimulated && supabaseClient) {
-                await supabaseClient.from('veiculos').insert([item]);
+            if (supabaseClient) {
+                if (editId) {
+                    const { error } = await supabaseClient.from('veiculos').update(item).eq('id', editId);
+                    if (error) {
+                        showNotification('Erro ao atualizar no Supabase: ' + error.message, 'error');
+                        return;
+                    }
+                } else {
+                    const { error } = await supabaseClient.from('veiculos').insert([item]);
+                    if (error) {
+                        showNotification('Erro ao salvar no Supabase: ' + error.message, 'error');
+                        return;
+                    }
+                }
                 fetchAllData();
             } else {
-                state.veiculos.push({ id: Date.now().toString(), ...item });
-                render();
+                showNotification('Conecte ao Supabase primeiro para salvar de forma definitiva.', 'error');
+                return;
             }
             closeModal();
-            showNotification('Veículo cadastrado com sucesso!');
+            showNotification(editId ? 'Veículo atualizado no Supabase!' : 'Veículo salvo definitivamente no Supabase!', 'success');
         }
 
         async function submitRefuel(e) {
@@ -534,15 +679,16 @@
                 km: 15000,
                 data: new Date().toISOString().split('T')[0]
             };
-            if (!isSimulated && supabaseClient) {
-                await supabaseClient.from('abastecimentos').insert([item]);
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('abastecimentos').insert([item]);
+                if (error) {
+                    showNotification('Erro ao salvar abastecimento: ' + error.message, 'error');
+                    return;
+                }
                 fetchAllData();
-            } else {
-                state.abastecimentos.push({ id: Date.now().toString(), ...item });
-                render();
             }
             closeModal();
-            showNotification('Abastecimento registrado com sucesso!');
+            showNotification('Abastecimento salvo definitivamente no Supabase!', 'success');
         }
 
         async function submitMaint(e) {
@@ -555,15 +701,16 @@
                 descricao: document.getElementById('mDesc').value,
                 data: new Date().toISOString().split('T')[0]
             };
-            if (!isSimulated && supabaseClient) {
-                await supabaseClient.from('manutencoes').insert([item]);
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('manutencoes').insert([item]);
+                if (error) {
+                    showNotification('Erro ao salvar manutenção: ' + error.message, 'error');
+                    return;
+                }
                 fetchAllData();
-            } else {
-                state.manutencoes.push({ id: Date.now().toString(), ...item });
-                render();
             }
             closeModal();
-            showNotification('Manutenção registrada com sucesso!');
+            showNotification('Manutenção salva definitivamente no Supabase!', 'success');
         }
 
         async function submitLog(e) {
@@ -576,15 +723,16 @@
                 finalidade: document.getElementById('lFinalidade').value,
                 data: new Date().toISOString().split('T')[0]
             };
-            if (!isSimulated && supabaseClient) {
-                await supabaseClient.from('diario_bordo').insert([item]);
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('diario_bordo').insert([item]);
+                if (error) {
+                    showNotification('Erro ao salvar diário de bordo: ' + error.message, 'error');
+                    return;
+                }
                 fetchAllData();
-            } else {
-                state.diario.push({ id: Date.now().toString(), ...item });
-                render();
             }
             closeModal();
-            showNotification('Diário de bordo registrado com sucesso!');
+            showNotification('Diário de bordo salvo definitivamente no Supabase!', 'success');
         }
 
         async function submitChecklist(e) {
@@ -593,17 +741,19 @@
                 placa: document.getElementById('cPlaca').value,
                 motorista: document.getElementById('cMotorista').value,
                 pneus: true, freios: true, oleo: true, eletrica: true,
+                observacoes: 'Tudo OK',
                 data: new Date().toISOString().split('T')[0]
             };
-            if (!isSimulated && supabaseClient) {
-                await supabaseClient.from('checklists').insert([item]);
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('checklists').insert([item]);
+                if (error) {
+                    showNotification('Erro ao salvar checklist: ' + error.message, 'error');
+                    return;
+                }
                 fetchAllData();
-            } else {
-                state.checklists.push({ id: Date.now().toString(), ...item });
-                render();
             }
             closeModal();
-            showNotification('Checklist registrado com sucesso!');
+            showNotification('Checklist salvo definitivamente no Supabase!', 'success');
         }
     </script>
 </body>
