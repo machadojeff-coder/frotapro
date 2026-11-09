@@ -385,3 +385,356 @@
             const kmRevStr = document.getElementById('km_ultima_revisao').value;
 
             const km_atual = kmAtualStr ? parseInt(kmAtualStr) : 0;
+            const km_ultimo_oleo = kmOleoStr ? parseInt(kmOleoStr) : km_atual;
+            const km_ultima_revisao = kmRevStr ? parseInt(kmRevStr) : km_atual;
+
+            const dados = {
+                placa,
+                prefixo: document.getElementById('prefixo').value.trim(),
+                modelo, 
+                unidade: document.getElementById('unidade').value.trim(),
+                combustivel: document.getElementById('combustivel').value,
+                status: document.getElementById('status').value,
+                local_uso: document.getElementById('local_uso').value.trim() || 'Pátio / Unidade',
+                km_atual,
+                km_ultimo_oleo,
+                km_ultima_revisao
+            };
+
+            const { error } = await supabaseClient.from('veiculos').upsert([dados]);
+            if (error) {
+                mostrarMsg('Erro ao salvar viatura: ' + error.message, 'erro');
+            } else {
+                mostrarMsg('Viatura salva com sucesso!');
+                limparFormularioVeiculo();
+                carregarTudo();
+            }
+        }
+
+        function prepararEdicao(placa, prefixo, modelo, unidade, combustivel, status, km, oleo, rev, local) {
+            document.getElementById('placa').value = placa;
+            document.getElementById('placa').disabled = true; // Bloqueia a placa na edição
+            document.getElementById('prefixo').value = prefixo;
+            document.getElementById('modelo').value = modelo;
+            document.getElementById('unidade').value = unidade;
+            document.getElementById('combustivel').value = combustivel;
+            document.getElementById('status').value = status;
+            document.getElementById('km_atual').value = km;
+            document.getElementById('km_ultimo_oleo').value = oleo;
+            document.getElementById('km_ultima_revisao').value = rev;
+            document.getElementById('local_uso').value = local;
+            mudarAba('frota', document.querySelectorAll('.menu-item')[1]);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function limparFormularioVeiculo() {
+            document.getElementById('placa').value = '';
+            document.getElementById('placa').disabled = false; // Destrava a placa para novo cadastro
+            document.getElementById('prefixo').value = '';
+            document.getElementById('modelo').value = '';
+            document.getElementById('unidade').value = '';
+            document.getElementById('km_atual').value = '';
+            document.getElementById('km_ultimo_oleo').value = '';
+            document.getElementById('km_ultima_revisao').value = '';
+            document.getElementById('local_uso').value = '';
+        }
+
+        async function deletarVeiculo(placa) {
+            if (confirm(`ATENÇÃO: Deseja realmente excluir a viatura ${placa}? O histórico dela também será apagado.`)) {
+                const { error } = await supabaseClient.from('veiculos').delete().eq('placa', placa);
+                if (error) mostrarMsg('Erro ao excluir: ' + error.message, 'erro');
+                else { mostrarMsg(`Viatura ${placa} excluída com sucesso!`); limparFormularioVeiculo(); carregarTudo(); }
+            }
+        }
+
+        // ==========================
+        // MÓDULO: DIÁRIO DE BORDO
+        // ==========================
+        function atualizarKmSaida() {
+            const placa = document.getElementById('diario-saida-placa').value;
+            const v = listaVeiculos.find(item => item.placa === placa);
+            if (document.getElementById('diario-saida-km')) document.getElementById('diario-saida-km').value = v ? (v.km_atual || 0) : 0;
+        }
+
+        async function iniciarViagemDiario() {
+            const placa = document.getElementById('diario-saida-placa').value;
+            const motorista = document.getElementById('diario-saida-motorista').value.trim();
+            const destino = document.getElementById('diario-saida-destino').value.trim();
+            if (!placa || !motorista || !destino) return mostrarMsg('Preencha Viatura, Motorista e Destino!', 'erro');
+
+            const novaViagem = {
+                data: new Date().toISOString(), placa, motorista, destino,
+                km_inicial: parseInt(document.getElementById('diario-saida-km').value) || 0,
+                status_viagem: 'Em Andamento', observacoes: document.getElementById('diario-saida-obs').value.trim()
+            };
+
+            const { error } = await supabaseClient.from('diario_bordo').insert([novaViagem]);
+            if (error) return mostrarMsg('Erro na saída: ' + error.message, 'erro');
+
+            await supabaseClient.from('veiculos').update({ status: 'Em Rota', local_uso: destino }).eq('placa', placa);
+            mostrarMsg(`Viatura ${placa} liberada Em Rota.`);
+            document.getElementById('diario-saida-motorista').value = ''; document.getElementById('diario-saida-destino').value = ''; document.getElementById('diario-saida-obs').value = '';
+            carregarTudo();
+        }
+
+        function selecionarViagemParaRetorno() {
+            const idViagem = document.getElementById('diario-retorno-id').value;
+            const viagem = cacheDiario.find(d => String(d.id) === String(idViagem));
+            if (viagem) {
+                document.getElementById('diario-retorno-km-ini').value = viagem.km_inicial || 0;
+                document.getElementById('diario-retorno-km-fim').value = '';
+                document.getElementById('diario-retorno-km-rodado').value = '0';
+            }
+        }
+
+        function calcularKmRetorno() {
+            const ini = parseInt(document.getElementById('diario-retorno-km-ini').value) || 0;
+            const fim = parseInt(document.getElementById('diario-retorno-km-fim').value) || 0;
+            document.getElementById('diario-retorno-km-rodado').value = (fim >= ini) ? (fim - ini) : 0;
+        }
+
+        async function encerrarViagemDiario() {
+            const idViagemStr = document.getElementById('diario-retorno-id').value;
+            if (!idViagemStr) return mostrarMsg('Selecione uma missão aberta!', 'erro');
+            
+            const viagem = cacheDiario.find(d => String(d.id) === String(idViagemStr));
+            if (!viagem) return;
+
+            const km_ini = viagem.km_inicial || 0;
+            const km_final = parseInt(document.getElementById('diario-retorno-km-fim').value) || 0;
+            const km_rodado = km_final - km_ini;
+
+            if (km_final <= 0 || km_final < km_ini) return mostrarMsg('O KM Final deve ser maior ou igual ao KM inicial!', 'erro');
+
+            const { error: errDiario } = await supabaseClient.from('diario_bordo')
+                .update({ km_final, km_rodado, status_viagem: 'Encerrada', data_retorno: new Date().toISOString() })
+                .eq('id', parseInt(idViagemStr));
+
+            if (errDiario) return mostrarMsg('Erro ao atualizar diário: ' + errDiario.message, 'erro');
+
+            const { error: errVtr } = await supabaseClient.from('veiculos')
+                .update({ km_atual: km_final, status: 'Disponível', local_uso: 'Pátio / Unidade' })
+                .eq('placa', viagem.placa);
+
+            if (errVtr) return mostrarMsg('Falha ao atualizar viatura: ' + errVtr.message, 'erro');
+
+            mostrarMsg(`Sucesso! Missão de ${viagem.placa} encerrada e retornada ao Pátio.`);
+            document.getElementById('diario-retorno-km-fim').value = '';
+            document.getElementById('diario-retorno-km-rodado').value = '0';
+            carregarTudo();
+        }
+
+        async function carregarDiarioBordo() {
+            const { data } = await supabaseClient.from('diario_bordo').select('*').order('data', { ascending: false }).limit(50);
+            cacheDiario = data || [];
+
+            const selectRetorno = document.getElementById('diario-retorno-id');
+            if (selectRetorno) {
+                selectRetorno.innerHTML = '';
+                const abertas = cacheDiario.filter(d => d.status_viagem === 'Em Andamento' || !d.km_final);
+                if (abertas.length === 0) {
+                    selectRetorno.innerHTML = '<option value="">Nenhuma missão aberta</option>';
+                    document.getElementById('diario-retorno-km-ini').value = '';
+                } else {
+                    abertas.forEach(v => { selectRetorno.innerHTML += `<option value="${v.id}">${v.placa} | ${v.motorista} | Destino: ${v.destino}</option>`; });
+                    selecionarViagemParaRetorno();
+                }
+            }
+
+            const tbody = document.querySelector('#tabela-diario tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                cacheDiario.forEach(d => {
+                    const badge = (d.status_viagem === 'Em Andamento' || !d.km_final) ? '<span class="badge badge-warn">Em Andamento</span>' : '<span class="badge badge-ok">Finalizada</span>';
+                    tbody.innerHTML += `<tr><td>${new Date(d.data).toLocaleDateString('pt-BR')}</td><td><strong>${d.placa}</strong></td><td>${d.motorista}</td><td>${d.destino}</td><td>${d.km_inicial} km</td><td>${d.km_final ? d.km_final + ' km' : 'Pendente'}</td><td><strong>${d.km_rodado || '-'}</strong></td><td>${badge}</td></tr>`;
+                });
+            }
+        }
+
+        // ==========================
+        // MÓDULOS GERAIS
+        // ==========================
+        function preencherSelects() {
+            const selSaida = document.getElementById('diario-saida-placa');
+            if (selSaida) {
+                selSaida.innerHTML = '';
+                const disponiveis = listaVeiculos.filter(v => v.status === 'Disponível');
+                if (disponiveis.length === 0) selSaida.innerHTML = '<option value="">Sem viatura disponível</option>';
+                else { disponiveis.forEach(v => { selSaida.innerHTML += `<option value="${v.placa}">${v.prefixo ? `[${v.prefixo}] ` : ''}${v.placa}</option>`; }); atualizarKmSaida(); }
+            }
+            ['abast-placa', 'man-placa', 'chk-placa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const selAtual = el.value; el.innerHTML = '';
+                    listaVeiculos.forEach(v => { el.innerHTML += `<option value="${v.placa}">${v.placa} - ${v.modelo}</option>`; });
+                    if (selAtual) el.value = selAtual;
+                }
+            });
+        }
+
+        async function salvarChecklist() {
+            const placa = document.getElementById('chk-placa').value;
+            const motorista = document.getElementById('chk-motorista').value.trim();
+            const destino = document.getElementById('chk-destino').value.trim() || 'Em Operação';
+            if (!motorista) return mostrarMsg('Informe o nome do motorista!', 'erro');
+
+            const dados = {
+                placa, motorista, destino,
+                km_saida: parseInt(document.getElementById('chk-km').value) || 0,
+                pneus: document.getElementById('chk-pneus').value === 'true',
+                oleo_fluidos: document.getElementById('chk-oleo').value === 'true',
+                sinalizacao: document.getElementById('chk-sinalizacao').value === 'true',
+                freios: document.getElementById('chk-freios').value === 'true',
+                avarias: document.getElementById('chk-avarias').value.trim()
+            };
+
+            const { error } = await supabaseClient.from('checklists_viagem').insert([dados]);
+            if (error) mostrarMsg('Erro ao gravar checklist: ' + error.message, 'erro');
+            else {
+                mostrarMsg('Checklist salvo!');
+                document.getElementById('chk-motorista').value = ''; document.getElementById('chk-destino').value = ''; document.getElementById('chk-km').value = ''; document.getElementById('chk-avarias').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarChecklists() {
+            const { data } = await supabaseClient.from('checklists_viagem').select('*').order('data_checklist', { ascending: false }).limit(50);
+            cacheChecklists = data || [];
+            const tbody = document.querySelector('#tabela-checklists tbody');
+            if (!tbody) return; tbody.innerHTML = '';
+            cacheChecklists.forEach(c => {
+                const statusStr = `Pneus:${c.pneus?'OK':'X'} | Óleo:${c.oleo_fluidos?'OK':'X'} | Luzes:${c.sinalizacao?'OK':'X'} | Freios:${c.freios?'OK':'X'}`;
+                tbody.innerHTML += `<tr><td>${new Date(c.data_checklist).toLocaleString('pt-BR')}</td><td><strong>${c.placa}</strong></td><td>${c.motorista}</td><td>${c.destino || '-'}</td><td>${c.km_saida ? c.km_saida + ' km' : '-'}</td><td>${statusStr}</td><td>${c.avarias || '-'}</td></tr>`;
+            });
+        }
+
+        async function salvarAbastecimento() {
+            const placa = document.getElementById('abast-placa').value;
+            const litros = parseFloat(document.getElementById('abast-litros').value) || 0;
+            const valor_total = parseFloat(document.getElementById('abast-valor').value) || 0;
+            const km_atual = parseInt(document.getElementById('abast-km').value) || 0;
+            if (!placa || valor_total <= 0) return mostrarMsg('Informe a viatura e o valor!', 'erro');
+
+            const { error } = await supabaseClient.from('abastecimentos').insert([{ placa, litros, valor_total, km_atual }]);
+            if (error) mostrarMsg('Erro: ' + error.message, 'erro');
+            else {
+                if (km_atual > 0) await supabaseClient.from('veiculos').update({ km_atual }).eq('placa', placa);
+                mostrarMsg('Abastecimento registrado!');
+                document.getElementById('abast-litros').value = ''; document.getElementById('abast-valor').value = ''; document.getElementById('abast-km').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarAbastecimentos() {
+            const { data } = await supabaseClient.from('abastecimentos').select('*').order('data_abastecimento', { ascending: false }).limit(10);
+            const tbody = document.querySelector('#tabela-abastecimentos tbody');
+            if(!tbody) return; tbody.innerHTML = '';
+            if (data) data.forEach(a => { tbody.innerHTML += `<tr><td>${new Date(a.data_abastecimento).toLocaleDateString('pt-BR')}</td><td><strong>${a.placa}</strong></td><td>${a.litros} L</td><td>R$ ${parseFloat(a.valor_total).toFixed(2)}</td><td>${a.km_atual || '-'} km</td></tr>`; });
+        }
+
+        async function salvarManutencao() {
+            const placa = document.getElementById('man-placa').value;
+            const tipo = document.getElementById('man-tipo').value;
+            const km_execucao = parseInt(document.getElementById('man-km').value) || 0;
+            const valor = parseFloat(document.getElementById('man-valor').value) || 0;
+            const descricao = document.getElementById('man-desc').value.trim();
+
+            if (!descricao || km_execucao <= 0) return mostrarMsg('Preencha a descrição e o KM!', 'erro');
+            const { error } = await supabaseClient.from('historico_manutencoes').insert([{ placa, tipo, km_execucao, valor, descricao }]);
+            if (error) return mostrarMsg('Erro: ' + error.message, 'erro');
+
+            const upd = { km_atual: km_execucao };
+            if (tipo === 'Troca de Óleo') upd.km_ultimo_oleo = km_execucao;
+            if (tipo === 'Revisão Geral') { upd.km_ultima_revisao = km_execucao; upd.km_ultimo_oleo = km_execucao; }
+
+            await supabaseClient.from('veiculos').update(upd).eq('placa', placa);
+            mostrarMsg('Manutenção registrada!');
+            document.getElementById('man-km').value = ''; document.getElementById('man-valor').value = ''; document.getElementById('man-desc').value = '';
+            carregarTudo();
+        }
+
+        async function carregarManutencoes() {
+            const { data } = await supabaseClient.from('historico_manutencoes').select('*').order('data_manutencao', { ascending: false }).limit(10);
+            const tbody = document.querySelector('#tabela-manutencoes tbody');
+            if(!tbody) return; tbody.innerHTML = '';
+            if (data) data.forEach(m => {
+                const cor = m.tipo.includes('Corretiva') ? 'badge-err' : 'badge-ok';
+                tbody.innerHTML += `<tr><td>${new Date(m.data_manutencao).toLocaleDateString('pt-BR')}</td><td><strong>${m.placa}</strong></td><td><span class="badge ${cor}">${m.tipo}</span></td><td>${m.descricao}</td><td>${m.km_execucao || '-'} km</td><td>R$ ${parseFloat(m.valor || 0).toFixed(2)}</td></tr>`;
+            });
+        }
+
+        function exportarParaCSV(nome, cabecalhos, linhas) {
+            let csv = '\uFEFF' + cabecalhos.join(';') + '\r\n';
+            linhas.forEach(linha => {
+                csv += linha.map(item => {
+                    let str = (item === null || item === undefined) ? '' : String(item);
+                    return (str.includes(';') || str.includes('"') || str.includes('\n')) ? `"${str.replace(/"/g, '""')}"` : str;
+                }).join(';') + '\r\n';
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.download = `${nome}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function baixarRelatorioChecklist() {
+            if (!cacheChecklists.length) return mostrarMsg('Nenhum registro!', 'erro');
+            exportarParaCSV('Checklists', ['Data', 'Placa', 'Motorista', 'Destino', 'KM Saida', 'Pneus', 'Oleo/Fluidos', 'Luzes', 'Freios', 'Avarias'], cacheChecklists.map(c => [
+                new Date(c.data_checklist).toLocaleString('pt-BR'), c.placa, c.motorista, c.destino||'', c.km_saida||0, c.pneus?'OK':'X', c.oleo_fluidos?'OK':'X', c.sinalizacao?'OK':'X', c.freios?'OK':'X', c.avarias||''
+            ]));
+        }
+
+        function baixarRelatorioDiario() {
+            if (!cacheDiario.length) return mostrarMsg('Nenhum registro!', 'erro');
+            exportarParaCSV('Diario_Bordo', ['Data', 'Placa', 'Motorista', 'Destino', 'KM Inicial', 'KM Final', 'KM Rodado', 'Status'], cacheDiario.map(d => [
+                new Date(d.data).toLocaleDateString('pt-BR'), d.placa, d.motorista, d.destino, d.km_inicial||0, d.km_final||'Pendente', d.km_rodado||0, d.status_viagem||'Encerrada'
+            ]));
+        }
+
+        function processarColagem() {
+            const rawText = document.getElementById('paste-area').value.trim();
+            if (!rawText) {
+                document.getElementById('container-preview').style.display = 'none';
+                document.getElementById('btn-importar-todos').style.display = 'none';
+                document.getElementById('count-preview').innerText = '0';
+                veiculosParaImportar = [];
+                return;
+            }
+            veiculosParaImportar = [];
+            const tbody = document.querySelector('#tabela-preview tbody'); tbody.innerHTML = '';
+            rawText.split(/\r?\n/).forEach((linha, idx) => {
+                const colunas = linha.split(/\t|;/).map(c => c.trim());
+                if (colunas.length < 2) return;
+                if (idx === 0 && (colunas[0].toLowerCase().includes('placa') || colunas[1].toLowerCase().includes('modelo'))) return;
+                const placa = (colunas[0] || '').toUpperCase();
+                const modelo = colunas[2] || '';
+                if (placa && modelo) {
+                    const km_atual = parseInt(colunas[5]) || 0;
+                    veiculosParaImportar.push({
+                        placa, prefixo: colunas[1] || '', modelo, unidade: colunas[3] || '', combustivel: colunas[4] || 'Flex',
+                        km_atual, km_ultimo_oleo: km_atual, km_ultima_revisao: km_atual, status: 'Disponível', local_uso: 'Pátio / Unidade'
+                    });
+                    tbody.innerHTML += `<tr><td><strong>${placa}</strong></td><td>${modelo}</td><td>${km_atual} km</td></tr>`;
+                }
+            });
+            document.getElementById('count-preview').innerText = veiculosParaImportar.length;
+            if (veiculosParaImportar.length > 0) {
+                document.getElementById('container-preview').style.display = 'block';
+                document.getElementById('btn-importar-todos').style.display = 'inline-block';
+            }
+        }
+
+        async function salvarLotePlanilha() {
+            if (!veiculosParaImportar.length) return;
+            const { error } = await supabaseClient.from('veiculos').upsert(veiculosParaImportar);
+            if (error) mostrarMsg('Erro ao importar: ' + error.message, 'erro');
+            else {
+                mostrarMsg(`${veiculosParaImportar.length} importadas!`);
+                document.getElementById('paste-area').value = ''; processarColagem(); carregarTudo();
+            }
+        }
+
+        carregarTudo();
+    </script>
+</body>
+</html>
