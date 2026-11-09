@@ -70,13 +70,11 @@
         button.btn:hover { background: var(--primary-hover); }
         button.btn-success { background: var(--success); }
         button.btn-success:hover { background: #059669; }
-        button.btn-warning { background: var(--warning); color: #0f172a; }
-        button.btn-warning:hover { background: #d97706; }
         button.btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid var(--danger); }
         button.btn-danger:hover { background: var(--danger); color: white; }
         button.btn-action { padding: 6px 12px; font-size: 12px; }
 
-        /* Blocos Operacionais do Diário */
+        /* Blocos do Diário */
         .diario-bloco { background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-light); border-radius: 10px; padding: 20px; margin-bottom: 25px; }
 
         /* Tabelas */
@@ -123,7 +121,7 @@
         <div id="aba-dashboard" class="tab-content active">
             <div class="page-header">
                 <h1>Visão Geral da Frota</h1>
-                <p>Status operacional das viaturas e controle preventivo de óleo (5.000 km) e revisão (10.000 km).</p>
+                <p>Status operacional das viaturas e alertas de óleo (5.000 km) e revisão preventiva (10.000 km).</p>
             </div>
 
             <div class="kpi-grid">
@@ -169,11 +167,11 @@
             </div>
         </div>
 
-        <!-- ABA 2: GESTÃO DE VIATURAS -->
+        <!-- ABA 2: CADASTRO / EDIÇÃO -->
         <div id="aba-frota" class="tab-content">
             <div class="page-header">
                 <h1>Gestão de Viaturas</h1>
-                <p>Cadastro detalhado e controle de hodômetros da frota.</p>
+                <p>Cadastro de viaturas e hodômetros da frota.</p>
             </div>
             
             <div class="form-grid">
@@ -215,14 +213,14 @@
             </div>
         </div>
 
-        <!-- ABA 3: DIÁRIO DE BORDO (SAÍDA E RETORNO VINCULADOS) -->
+        <!-- ABA 3: DIÁRIO DE BORDO (VINCULADO SAÍDA / RETORNO) -->
         <div id="aba-diario" class="tab-content">
             <div class="page-header">
                 <h1>Diário de Bordo</h1>
-                <p>Controle de saída e retorno ao pátio. O KM final só pode ser informado no encerramento da missão.</p>
+                <p>O KM final só pode ser inserido no retorno ao pátio. Enquanto isso, a viatura permanece em uso.</p>
             </div>
 
-            <!-- ETAPA 1: REGISTRAR SAÍDA -->
+            <!-- ETAPA 1: SAÍDA -->
             <div class="diario-bloco">
                 <h3 style="color: #60a5fa; margin-top:0; margin-bottom:15px; font-size:15px;">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> 1. Registrar Saída (Início da Missão)
@@ -233,23 +231,23 @@
                         <select id="diario-saida-placa" onchange="atualizarKmSaida()"></select>
                     </div>
                     <div><label>Data da Saída</label><input type="date" id="diario-saida-data"></div>
-                    <div><label>Motorista / Condutor *</label><input type="text" id="diario-saida-motorista" placeholder="Nome do motorista"></div>
-                    <div><label>Destino / Missão *</label><input type="text" id="diario-saida-destino" placeholder="Ex: Patrulhamento / Adm"></div>
+                    <div><label>Motorista / Condutor *</label><input type="text" id="diario-saida-motorista" placeholder="Nome do condutor"></div>
+                    <div><label>Destino / Missão *</label><input type="text" id="diario-saida-destino" placeholder="Ex: Patrulhamento Setorial"></div>
                     <div>
                         <label>KM Inicial</label>
                         <input type="number" id="diario-saida-km" readonly style="background: rgba(15, 23, 42, 0.6); color: #38bdf8; font-weight: bold;">
                     </div>
-                    <div><label>Observações</label><input type="text" id="diario-saida-obs" placeholder="Obs de saída (opcional)"></div>
+                    <div><label>Observações</label><input type="text" id="diario-saida-obs" placeholder="Detalhes opcionais"></div>
                     <div style="grid-column: span 2; display: flex; align-items: flex-end;">
                         <button class="btn btn-primary" style="width: 100%;" onclick="iniciarViagemDiario()"><i class="fa-solid fa-play"></i> Registrar Saída (Colocar Viatura Em Rota)</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ETAPA 2: REGISTRAR RETORNO AO PÁTIO -->
+            <!-- ETAPA 2: RETORNO -->
             <div class="diario-bloco" style="border-color: rgba(16, 185, 129, 0.4);">
                 <h3 style="color: #34d399; margin-top:0; margin-bottom:15px; font-size:15px;">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> 2. Registrar Retorno ao Pátio (Encerrar Missão e KM Final)
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> 2. Registrar Retorno ao Pátio (Encerramento de Missão)
                 </h3>
                 <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:0; background:transparent; padding:0; border:none;">
                     <div style="grid-column: span 2;">
@@ -275,7 +273,7 @@
             </div>
 
             <div class="section-header">
-                <h3 class="section-title">Histórico Geral de Viagens</h3>
+                <h3 class="section-title">Histórico de Viagens</h3>
                 <button class="btn btn-success btn-action" onclick="baixarRelatorioDiario()"><i class="fa-solid fa-file-excel"></i> Baixar Diário de Bordo (CSV)</button>
             </div>
             <div class="table-container">
@@ -286,7 +284,7 @@
             </div>
         </div>
 
-        <!-- ABA 4: CHECKLIST DE SAÍDA -->
+        <!-- ABA 4: CHECKLIST -->
         <div id="aba-checklist" class="tab-content">
             <div class="page-header">
                 <h1>Checklist de Inspeção Pré-Viagem</h1>
@@ -295,14 +293,14 @@
 
             <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
                 <div><label>Selecione a Viatura</label><select id="chk-placa"></select></div>
-                <div><label>Motorista / Condutor</label><input type="text" id="chk-motorista" placeholder="Nome do responsável"></div>
-                <div><label>Destino / Missão</label><input type="text" id="chk-destino" placeholder="Ex: Patrulhamento Setor 1"></div>
+                <div><label>Motorista / Condutor</label><input type="text" id="chk-motorista" placeholder="Nome do condutor"></div>
+                <div><label>Destino / Missão</label><input type="text" id="chk-destino" placeholder="Ex: Patrulhamento"></div>
                 <div><label>KM no Painel</label><input type="number" id="chk-km" placeholder="Ex: 45200"></div>
                 <div><label>Pneus / Calibragem</label><select id="chk-pneus"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
                 <div><label>Nível de Óleo / Fluidos</label><select id="chk-oleo"><option value="true">Conforme (OK)</option><option value="false">Baixo / Irregular</option></select></div>
-                <div><label>Sinalização / Luzes</label><select id="chk-sinalizacao"><option value="true">Conforme (OK)</option><option value="false">Irregular / Queimada</option></select></div>
+                <div><label>Sinalização / Luzes</label><select id="chk-sinalizacao"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
                 <div><label>Freios</label><select id="chk-freios"><option value="true">Conforme (OK)</option><option value="false">Irregular</option></select></div>
-                <div style="grid-column: span 2;"><label>Observações / Avarias</label><input type="text" id="chk-avarias" placeholder="Arranhões, luz no painel, etc."></div>
+                <div style="grid-column: span 2;"><label>Observações / Avarias</label><input type="text" id="chk-avarias" placeholder="Observações de avaria..."></div>
                 <div style="grid-column: span 2; display: flex; align-items: flex-end;">
                     <button class="btn" style="width: 100%;" onclick="salvarChecklist()"><i class="fa-solid fa-clipboard-check"></i> Registrar Checklist</button>
                 </div>
@@ -320,11 +318,11 @@
             </div>
         </div>
 
-        <!-- ABA 5: IMPORTAÇÃO POR COPIAR/COLAR -->
+        <!-- ABA 5: IMPORTAR PLANILHA -->
         <div id="aba-importar" class="tab-content">
             <div class="page-header">
                 <h1>Importar Viaturas de Planilha</h1>
-                <p>Copie e cole dados em lote de qualquer planilha.</p>
+                <p>Copie e cole dados em lote de planilhas do Excel ou Google Sheets.</p>
             </div>
 
             <div class="info-box">
@@ -378,7 +376,7 @@
         <div id="aba-manutencoes" class="tab-content">
             <div class="page-header">
                 <h1>Manutenções e Intervenções</h1>
-                <p>Controle mecânico e redefinição dos alertas preventivos.</p>
+                <p>Registro de serviços e redefinição dos alertas de quilometragem.</p>
             </div>
 
             <div class="form-grid">
@@ -393,7 +391,7 @@
                 </div>
                 <div><label>KM da Execução</label><input type="number" id="man-km" placeholder="Ex: 45000"></div>
                 <div><label>Valor (R$)</label><input type="number" step="0.01" id="man-valor" placeholder="0.00"></div>
-                <div style="grid-column: span 2;"><label>Descrição / Oficina</label><input type="text" id="man-desc" placeholder="Troca de óleo sintético, filtros, pastilhas..."></div>
+                <div style="grid-column: span 2;"><label>Descrição / Oficina</label><input type="text" id="man-desc" placeholder="Troca de óleo, filtros, pastilhas..."></div>
                 <div style="grid-column: span 2; display: flex; align-items: flex-end;">
                     <button class="btn" style="width: 100%;" onclick="salvarManutencao()"><i class="fa-solid fa-wrench"></i> Registrar Manutenção</button>
                 </div>
@@ -410,14 +408,14 @@
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://lphbqipxqcuunoomwxpw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
+        const SUPABASE_URL = 'https://hoyoudgzowymkmgmojrz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_gZ9qMO5ncQx3BKC0kkMcaA_-TUnPdvJ';
 
         let supabaseClient;
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (e) {
-            console.error('Falha ao instanciar Supabase:', e);
+            console.error('Falha ao inicializar o Supabase:', e);
         }
 
         let listaVeiculos = [];
@@ -425,10 +423,14 @@
         let cacheDiario = [];
         let veiculosParaImportar = [];
 
-        document.getElementById('diario-saida-data').value = new Date().toISOString().split('T')[0];
+        try {
+            const campoData = document.getElementById('diario-saida-data');
+            if (campoData) campoData.value = new Date().toISOString().split('T')[0];
+        } catch(e){}
 
         function mostrarMsg(texto, tipo = 'sucesso') {
             const box = document.getElementById('feedback-msg');
+            if (!box) return;
             box.innerText = texto;
             box.className = `msg-box ${tipo === 'sucesso' ? 'msg-success' : 'msg-error'}`;
             box.style.display = 'block';
@@ -444,13 +446,21 @@
             if (abaAlvo) abaAlvo.classList.add('active');
             if (btnElement) btnElement.classList.add('active');
 
-            if (abaId === 'dashboard') atualizarDashboard();
-            if (['checklist', 'abastecimentos', 'manutencoes', 'diario'].includes(abaId)) preencherSelects();
-            if (abaId === 'checklist') carregarChecklists();
-            if (abaId === 'diario') { carregarDiarioBordo(); }
+            try {
+                if (abaId === 'dashboard') atualizarDashboard();
+                if (['checklist', 'abastecimentos', 'manutencoes', 'diario'].includes(abaId)) preencherSelects();
+                if (abaId === 'checklist') carregarChecklists();
+                if (abaId === 'diario') carregarDiarioBordo();
+            } catch (err) {
+                console.error('Erro ao alternar aba:', err);
+            }
         }
 
         async function carregarTudo() {
+            if (!supabaseClient) {
+                mostrarMsg('Cliente do banco não inicializado.', 'erro');
+                return;
+            }
             try {
                 const { data, error } = await supabaseClient.from('veiculos').select('*').order('placa');
                 if (error) throw error;
@@ -477,6 +487,7 @@
             let alertasRev = 0;
 
             const tbody = document.querySelector('#tabela-resumo tbody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             listaVeiculos.forEach(v => {
@@ -533,6 +544,7 @@
 
         function renderizarFrota() {
             const tbody = document.querySelector('#tabela-frota tbody');
+            if (!tbody) return;
             tbody.innerHTML = '';
             listaVeiculos.forEach(v => {
                 const badge = v.status === 'Disponível' ? 'badge-ok' : (v.status === 'Em Rota' ? 'badge-warn' : 'badge-err');
@@ -621,8 +633,9 @@
         function atualizarKmSaida() {
             const placa = document.getElementById('diario-saida-placa').value;
             const v = listaVeiculos.find(item => item.placa === placa);
-            if (v) {
-                document.getElementById('diario-saida-km').value = v.km_atual || 0;
+            const campoKm = document.getElementById('diario-saida-km');
+            if (campoKm) {
+                campoKm.value = v ? (v.km_atual || 0) : 0;
             }
         }
 
@@ -661,7 +674,6 @@
                 return;
             }
 
-            // Viatura passa a ficar 'Em Rota' com o local de destino
             await supabaseClient.from('veiculos').update({
                 status: 'Em Rota',
                 local_uso: destino
@@ -675,4 +687,425 @@
         }
 
         function selecionarViagemParaRetorno() {
-            const id
+            const idViagem = document.getElementById('diario-retorno-id').value;
+            const viagem = cacheDiario.find(d => String(d.id) === String(idViagem));
+            if (viagem) {
+                document.getElementById('diario-retorno-km-ini').value = viagem.km_inicial || 0;
+                document.getElementById('diario-retorno-km-fim').value = '';
+                document.getElementById('diario-retorno-km-rodado').value = '0';
+            }
+        }
+
+        function calcularKmRetorno() {
+            const ini = parseInt(document.getElementById('diario-retorno-km-ini').value) || 0;
+            const fim = parseInt(document.getElementById('diario-retorno-km-fim').value) || 0;
+            const rodado = (fim >= ini) ? (fim - ini) : 0;
+            document.getElementById('diario-retorno-km-rodado').value = rodado;
+        }
+
+        async function encerrarViagemDiario() {
+            const idViagem = document.getElementById('diario-retorno-id').value;
+            if (!idViagem) {
+                mostrarMsg('Selecione uma viagem em aberto para encerrar!', 'erro');
+                return;
+            }
+
+            const viagem = cacheDiario.find(d => String(d.id) === String(idViagem));
+            if (!viagem) return;
+
+            const km_inicial = viagem.km_inicial || 0;
+            const km_final = parseInt(document.getElementById('diario-retorno-km-fim').value) || 0;
+            const km_rodado = km_final - km_inicial;
+
+            if (!km_final || km_final <= 0) {
+                mostrarMsg('Informe o KM Final marcado no painel ao retornar ao pátio!', 'erro');
+                return;
+            }
+            if (km_final < km_inicial) {
+                mostrarMsg(`O KM Final (${km_final}) não pode ser menor que o KM Inicial (${km_inicial})!`, 'erro');
+                return;
+            }
+
+            const { error } = await supabaseClient.from('diario_bordo').update({
+                km_final,
+                km_rodado,
+                status_viagem: 'Encerrada',
+                data_retorno: new Date().toISOString()
+            }).eq('id', idViagem);
+
+            if (error) {
+                mostrarMsg('Erro ao encerrar viagem: ' + error.message, 'erro');
+                return;
+            }
+
+            await supabaseClient.from('veiculos').update({
+                km_atual: km_final,
+                status: 'Disponível',
+                local_uso: 'Pátio / Unidade'
+            }).eq('placa', viagem.placa);
+
+            mostrarMsg(`Missão encerrada! Viatura ${viagem.placa} retornou ao pátio e está DISPONÍVEL.`);
+            document.getElementById('diario-retorno-km-fim').value = '';
+            document.getElementById('diario-retorno-km-rodado').value = '0';
+            await carregarTudo();
+        }
+
+        async function carregarDiarioBordo() {
+            try {
+                const { data, error } = await supabaseClient.from('diario_bordo').select('*').order('data', { ascending: false }).limit(50);
+                if (error) throw error;
+                cacheDiario = data || [];
+
+                const selectRetorno = document.getElementById('diario-retorno-id');
+                if (selectRetorno) {
+                    selectRetorno.innerHTML = '';
+                    const viagensAbertas = cacheDiario.filter(d => d.status_viagem === 'Em Andamento' || !d.km_final);
+
+                    if (viagensAbertas.length === 0) {
+                        selectRetorno.innerHTML = '<option value="">Nenhuma viatura em missão no momento</option>';
+                        document.getElementById('diario-retorno-km-ini').value = '';
+                    } else {
+                        viagensAbertas.forEach(v => {
+                            selectRetorno.innerHTML += `<option value="${v.id}">${v.placa} | ${v.motorista} | Destino: ${v.destino} (Saída: ${new Date(v.data).toLocaleDateString('pt-BR')})</option>`;
+                        });
+                        selecionarViagemParaRetorno();
+                    }
+                }
+
+                const tbody = document.querySelector('#tabela-diario tbody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    cacheDiario.forEach(d => {
+                        const isAberta = d.status_viagem === 'Em Andamento' || !d.km_final;
+                        const badge = isAberta 
+                            ? '<span class="badge badge-warn">Em Andamento</span>' 
+                            : '<span class="badge badge-ok">Finalizada</span>';
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${new Date(d.data).toLocaleDateString('pt-BR')}</td>
+                                <td><strong>${d.placa}</strong></td>
+                                <td>${d.motorista}</td>
+                                <td>${d.destino}</td>
+                                <td>${(d.km_inicial || 0).toLocaleString('pt-BR')} km</td>
+                                <td>${d.km_final ? d.km_final.toLocaleString('pt-BR') + ' km' : '<span style="color:#f59e0b;">Pendente</span>'}</td>
+                                <td><strong>${d.km_rodado ? d.km_rodado.toLocaleString('pt-BR') + ' km' : '-'}</strong></td>
+                                <td>${badge}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.error('Falha ao carregar diário:', e);
+            }
+        }
+
+        // === PREENCHIMENTO DE SELECTS ===
+        function preencherSelects() {
+            const selSaida = document.getElementById('diario-saida-placa');
+            if (selSaida) {
+                selSaida.innerHTML = '';
+                const disponiveis = listaVeiculos.filter(v => v.status === 'Disponível');
+                if (disponiveis.length === 0) {
+                    selSaida.innerHTML = '<option value="">Nenhuma viatura disponível no pátio</option>';
+                    document.getElementById('diario-saida-km').value = '';
+                } else {
+                    disponiveis.forEach(v => {
+                        selSaida.innerHTML += `<option value="${v.placa}">${v.prefixo ? `[${v.prefixo}] ` : ''}${v.placa} - ${v.modelo}</option>`;
+                    });
+                    atualizarKmSaida();
+                }
+            }
+
+            const outrosSelects = ['abast-placa', 'man-placa', 'chk-placa'];
+            outrosSelects.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const selAtual = el.value;
+                    el.innerHTML = '';
+                    listaVeiculos.forEach(v => {
+                        el.innerHTML += `<option value="${v.placa}">${v.prefixo ? `[${v.prefixo}] ` : ''}${v.placa} - ${v.modelo}</option>`;
+                    });
+                    if (selAtual) el.value = selAtual;
+                }
+            });
+        }
+
+        // === CHECKLIST ===
+        async function salvarChecklist() {
+            const placa = document.getElementById('chk-placa').value;
+            const motorista = document.getElementById('chk-motorista').value.trim();
+            const destino = document.getElementById('chk-destino').value.trim() || 'Em Operação';
+            const km_saida = parseInt(document.getElementById('chk-km').value) || 0;
+            const pneus = document.getElementById('chk-pneus').value === 'true';
+            const oleo_fluidos = document.getElementById('chk-oleo').value === 'true';
+            const sinalizacao = document.getElementById('chk-sinalizacao').value === 'true';
+            const freios = document.getElementById('chk-freios').value === 'true';
+            const avarias = document.getElementById('chk-avarias').value.trim();
+
+            if (!motorista) {
+                mostrarMsg('Informe o nome do motorista/condutor!', 'erro');
+                return;
+            }
+
+            const dadosChecklist = { placa, motorista, destino, km_saida, pneus, oleo_fluidos, sinalizacao, freios, avarias };
+            const { error } = await supabaseClient.from('checklists_viagem').insert([dadosChecklist]);
+
+            if (error) {
+                mostrarMsg('Erro ao gravar checklist: ' + error.message, 'erro');
+            } else {
+                mostrarMsg('Checklist salvo com sucesso!');
+                document.getElementById('chk-motorista').value = '';
+                document.getElementById('chk-destino').value = '';
+                document.getElementById('chk-km').value = '';
+                document.getElementById('chk-avarias').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarChecklists() {
+            try {
+                const { data } = await supabaseClient.from('checklists_viagem').select('*').order('data_checklist', { ascending: false }).limit(50);
+                cacheChecklists = data || [];
+                const tbody = document.querySelector('#tabela-checklists tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                cacheChecklists.forEach(c => {
+                    const statusStr = `Pneus:${c.pneus?'OK':'X'} | Óleo:${c.oleo_fluidos?'OK':'X'} | Luzes:${c.sinalizacao?'OK':'X'} | Freios:${c.freios?'OK':'X'}`;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(c.data_checklist).toLocaleString('pt-BR')}</td>
+                            <td><strong>${c.placa}</strong></td>
+                            <td>${c.motorista}</td>
+                            <td>${c.destino || '-'}</td>
+                            <td>${c.km_saida ? c.km_saida + ' km' : '-'}</td>
+                            <td>${statusStr}</td>
+                            <td>${c.avarias || '-'}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e){}
+        }
+
+        // === EXPORTAÇÃO CSV ===
+        function exportarParaCSV(nomeArquivo, cabecalhos, linhas) {
+            let csvContent = '\uFEFF';
+            csvContent += cabecalhos.join(';') + '\r\n';
+
+            linhas.forEach(linha => {
+                const linhaTratada = linha.map(item => {
+                    let str = (item === null || item === undefined) ? '' : String(item);
+                    if (str.includes(';') || str.includes('"') || str.includes('\n')) {
+                        str = `"${str.replace(/"/g, '""')}"`;
+                    }
+                    return str;
+                });
+                csvContent += linhaTratada.join(';') + '\r\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${nomeArquivo}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function baixarRelatorioChecklist() {
+            if (cacheChecklists.length === 0) {
+                mostrarMsg('Nenhum registro de checklist para exportar!', 'erro');
+                return;
+            }
+            const cabecalhos = ['Data/Hora', 'Placa', 'Motorista', 'Destino', 'KM Saida', 'Pneus', 'Oleo/Fluidos', 'Luzes', 'Freios', 'Observacoes/Avarias'];
+            const linhas = cacheChecklists.map(c => [
+                new Date(c.data_checklist).toLocaleString('pt-BR'),
+                c.placa,
+                c.motorista,
+                c.destino || '',
+                c.km_saida || 0,
+                c.pneus ? 'OK' : 'Irregular',
+                c.oleo_fluidos ? 'OK' : 'Irregular',
+                c.sinalizacao ? 'OK' : 'Irregular',
+                c.freios ? 'OK' : 'Irregular',
+                c.avarias || ''
+            ]);
+            exportarParaCSV('Relatorio_Checklists_FrotaPro', cabecalhos, linhas);
+        }
+
+        function baixarRelatorioDiario() {
+            if (cacheDiario.length === 0) {
+                mostrarMsg('Nenhum registro no Diário de Bordo para exportar!', 'erro');
+                return;
+            }
+            const cabecalhos = ['Data', 'Placa', 'Motorista', 'Destino', 'KM Inicial', 'KM Final', 'KM Rodado', 'Status'];
+            const linhas = cacheDiario.map(d => [
+                new Date(d.data).toLocaleDateString('pt-BR'),
+                d.placa,
+                d.motorista,
+                d.destino,
+                d.km_inicial || 0,
+                d.km_final || 'Pendente',
+                d.km_rodado || 0,
+                d.status_viagem || 'Encerrada'
+            ]);
+            exportarParaCSV('Diario_de_Bordo_FrotaPro', cabecalhos, linhas);
+        }
+
+        // === IMPORTADOR DE PLANILHA ===
+        function processarColagem() {
+            const rawText = document.getElementById('paste-area').value.trim();
+            if (!rawText) {
+                document.getElementById('container-preview').style.display = 'none';
+                document.getElementById('btn-importar-todos').style.display = 'none';
+                document.getElementById('count-preview').innerText = '0';
+                veiculosParaImportar = [];
+                return;
+            }
+
+            const linhas = rawText.split(/\r?\n/);
+            veiculosParaImportar = [];
+            const tbody = document.querySelector('#tabela-preview tbody');
+            tbody.innerHTML = '';
+
+            linhas.forEach((linha, idx) => {
+                const colunas = linha.split(/\t|;/).map(c => c.trim());
+                if (colunas.length < 2) return;
+                if (idx === 0 && (colunas[0].toLowerCase().includes('placa') || colunas[1].toLowerCase().includes('modelo'))) return;
+
+                const placa = (colunas[0] || '').toUpperCase();
+                const prefixo = colunas[1] || '';
+                const modelo = colunas[2] || '';
+                const unidade = colunas[3] || '';
+                const combustivel = colunas[4] || 'Flex';
+                const km_atual = parseInt(colunas[5]) || 0;
+
+                if (placa && modelo) {
+                    veiculosParaImportar.push({
+                        placa, prefixo, modelo, unidade, combustivel, km_atual,
+                        km_ultimo_oleo: km_atual, km_ultima_revisao: km_atual,
+                        status: 'Disponível', local_uso: 'Pátio / Unidade'
+                    });
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${placa}</strong></td>
+                            <td>${prefixo || '-'}</td>
+                            <td>${modelo}</td>
+                            <td>${unidade || '-'}</td>
+                            <td>${combustivel}</td>
+                            <td>${km_atual.toLocaleString('pt-BR')} km</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            document.getElementById('count-preview').innerText = veiculosParaImportar.length;
+            if (veiculosParaImportar.length > 0) {
+                document.getElementById('container-preview').style.display = 'block';
+                document.getElementById('btn-importar-todos').style.display = 'inline-block';
+            }
+        }
+
+        async function salvarLotePlanilha() {
+            if (veiculosParaImportar.length === 0) return;
+            const { error } = await supabaseClient.from('veiculos').upsert(veiculosParaImportar);
+            if (error) {
+                mostrarMsg('Erro ao importar: ' + error.message, 'erro');
+            } else {
+                mostrarMsg(`${veiculosParaImportar.length} viaturas importadas com sucesso!`);
+                document.getElementById('paste-area').value = '';
+                processarColagem();
+                carregarTudo();
+                mudarAba('dashboard', document.querySelectorAll('.menu-item')[0]);
+            }
+        }
+
+        // === ABASTECIMENTOS E MANUTENÇÕES ===
+        async function salvarAbastecimento() {
+            const placa = document.getElementById('abast-placa').value;
+            const litros = parseFloat(document.getElementById('abast-litros').value) || 0;
+            const valor_total = parseFloat(document.getElementById('abast-valor').value) || 0;
+            const km_atual = parseInt(document.getElementById('abast-km').value) || 0;
+
+            if (!placa || valor_total <= 0) {
+                mostrarMsg('Informe a viatura e o valor total!', 'erro');
+                return;
+            }
+
+            const { error } = await supabaseClient.from('abastecimentos').insert([{ placa, litros, valor_total, km_atual }]);
+            if (error) mostrarMsg('Erro: ' + error.message, 'erro');
+            else {
+                if (km_atual > 0) await supabaseClient.from('veiculos').update({ km_atual }).eq('placa', placa);
+                mostrarMsg('Abastecimento registrado!');
+                document.getElementById('abast-litros').value = '';
+                document.getElementById('abast-valor').value = '';
+                document.getElementById('abast-km').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarAbastecimentos() {
+            try {
+                const { data } = await supabaseClient.from('abastecimentos').select('*').order('data_abastecimento', { ascending: false }).limit(10);
+                const tbody = document.querySelector('#tabela-abastecimentos tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (data) data.forEach(a => {
+                    tbody.innerHTML += `<tr><td>${new Date(a.data_abastecimento).toLocaleDateString('pt-BR')}</td><td><strong>${a.placa}</strong></td><td>${a.litros} L</td><td>R$ ${parseFloat(a.valor_total).toFixed(2)}</td><td>${a.km_atual || '-'} km</td></tr>`;
+                });
+            } catch(e){}
+        }
+
+        async function salvarManutencao() {
+            const placa = document.getElementById('man-placa').value;
+            const tipo = document.getElementById('man-tipo').value;
+            const km_execucao = parseInt(document.getElementById('man-km').value) || 0;
+            const valor = parseFloat(document.getElementById('man-valor').value) || 0;
+            const descricao = document.getElementById('man-desc').value.trim();
+
+            if (!descricao || km_execucao <= 0) {
+                mostrarMsg('Preencha a descrição e o KM da manutenção!', 'erro');
+                return;
+            }
+
+            const { error } = await supabaseClient.from('historico_manutencoes').insert([{ placa, tipo, km_execucao, valor, descricao }]);
+            if (error) {
+                mostrarMsg('Erro: ' + error.message, 'erro');
+            } else {
+                const updateData = { km_atual: km_execucao };
+                if (tipo === 'Troca de Óleo') updateData.km_ultimo_oleo = km_execucao;
+                if (tipo === 'Revisão Geral') {
+                    updateData.km_ultima_revisao = km_execucao;
+                    updateData.km_ultimo_oleo = km_execucao;
+                }
+
+                await supabaseClient.from('veiculos').update(updateData).eq('placa', placa);
+
+                mostrarMsg('Manutenção registrada e hodômetros atualizados!');
+                document.getElementById('man-km').value = '';
+                document.getElementById('man-valor').value = '';
+                document.getElementById('man-desc').value = '';
+                carregarTudo();
+            }
+        }
+
+        async function carregarManutencoes() {
+            try {
+                const { data } = await supabaseClient.from('historico_manutencoes').select('*').order('data_manutencao', { ascending: false }).limit(10);
+                const tbody = document.querySelector('#tabela-manutencoes tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (data) data.forEach(m => {
+                    const cor = m.tipo.includes('Corretiva') ? 'badge-err' : 'badge-ok';
+                    tbody.innerHTML += `<tr><td>${new Date(m.data_manutencao).toLocaleDateString('pt-BR')}</td><td><strong>${m.placa}</strong></td><td><span class="badge ${cor}">${m.tipo}</span></td><td>${m.descricao}</td><td>${m.km_execucao || '-'} km</td><td>R$ ${parseFloat(m.valor || 0).toFixed(2)}</td></tr>`;
+                });
+            } catch(e){}
+        }
+
+        // Inicialização
+        carregarTudo();
+    </script>
+</body>
+</html>
