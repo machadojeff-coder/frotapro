@@ -161,14 +161,19 @@
             <div class="table-container"><table id="tabela-checklists"><thead><tr><th>Data</th><th>Viatura</th><th>Motorista</th><th>Destino</th><th>KM</th><th>Status</th><th>Avarias</th></tr></thead><tbody></tbody></table></div>
         </div>
 
-        <!-- Importação, Abastecimento, Manutenção -->
+        <!-- Importar Planilha -->
         <div id="aba-importar" class="tab-content">
             <div class="page-header"><h1>Importar Lote</h1></div>
-            <textarea id="paste-area" rows="6" placeholder="PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL" oninput="processarColagem()" style="width:100%; padding:10px;"></textarea>
-            <div style="margin-top:15px;"><button class="btn" id="btn-importar-todos" style="display:none;" onclick="salvarLotePlanilha()">Confirmar Lote</button></div>
+            <div class="info-box"><i class="fa-solid fa-circle-info"></i> Cole abaixo os dados copiados do Excel ou LibreOffice na ordem: <code>PLACA | PREFIXO | MODELO | UNIDADE | COMBUSTÍVEL | KM ATUAL</code></div>
+            <textarea id="paste-area" rows="6" placeholder="Cole aqui..." oninput="processarColagem()" style="width:100%; padding:10px; background:var(--bg-body); color:white; border:1px solid var(--border-light); border-radius:6px;"></textarea>
+            <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                <h3 class="section-title" style="margin:0; border:none;">Detectados: <span id="count-preview">0</span></h3>
+                <button class="btn btn-success" id="btn-importar-todos" style="display:none;" onclick="salvarLotePlanilha()">Confirmar e Salvar Lote</button>
+            </div>
             <div class="table-container" id="container-preview" style="display:none; margin-top:15px;"><table id="tabela-preview"><thead><tr><th>Placa</th><th>Modelo</th><th>KM</th></tr></thead><tbody></tbody></table></div>
         </div>
 
+        <!-- Abastecimentos e Manutenções -->
         <div id="aba-abastecimentos" class="tab-content">
             <div class="page-header"><h1>Abastecimentos</h1></div>
             <div class="form-grid">
@@ -196,7 +201,7 @@
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://lphbqipxqcuunoomwxpw.supabase.co';
+        const SUPABASE_URL = 'https://hoyoudgzowymkmgmojrz.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_0sAEpXrP-9UR8lEUzw8qxA_i5h8xvdm';
         
         let supabaseClient;
@@ -392,6 +397,67 @@
             }
         }
 
+        // --- IMPORTAR LOTE ---
+        function processarColagem() {
+            const rawText = document.getElementById('paste-area').value.trim();
+            if (!rawText) {
+                document.getElementById('container-preview').style.display = 'none';
+                document.getElementById('btn-importar-todos').style.display = 'none';
+                document.getElementById('count-preview').innerText = '0';
+                veiculosParaImportar = [];
+                return;
+            }
+            veiculosParaImportar = [];
+            const tbody = document.querySelector('#tabela-preview tbody'); 
+            if(tbody) tbody.innerHTML = '';
+            
+            const linhas = rawText.split(/\r?\n/);
+            linhas.forEach((linha, idx) => {
+                const colunas = linha.split(/\t|;/).map(c => c.trim());
+                if (colunas.length < 2) return;
+                if (idx === 0 && (colunas[0].toLowerCase().includes('placa') || colunas[1].toLowerCase().includes('modelo'))) return;
+                
+                const placa = (colunas[0] || '').toUpperCase();
+                const prefixo = colunas[1] || '';
+                const modelo = colunas[2] || 'Viatura';
+                const unidade = colunas[3] || '23º BPM';
+                const combustivel = colunas[4] || 'Flex';
+                const km_atual = parseInt(colunas[5]) || 0;
+
+                if (placa) {
+                    veiculosParaImportar.push({
+                        placa, prefixo, modelo, unidade, combustivel,
+                        status: 'Disponível', local_uso: 'Pátio / Unidade',
+                        km_atual, km_ultimo_oleo: km_atual, km_ultima_revisao: km_atual
+                    });
+                    if(tbody) {
+                        tbody.innerHTML += `<tr><td><strong>${placa}</strong></td><td>${modelo}</td><td>${km_atual} km</td></tr>`;
+                    }
+                }
+            });
+
+            document.getElementById('count-preview').innerText = veiculosParaImportar.length;
+            if (veiculosParaImportar.length > 0) {
+                document.getElementById('container-preview').style.display = 'block';
+                document.getElementById('btn-importar-todos').style.display = 'inline-block';
+            }
+        }
+
+        async function salvarLotePlanilha() {
+            if (!veiculosParaImportar.length) return mostrarMsg('Nenhum veículo detectado.', 'erro');
+            try {
+                const { error } = await supabaseClient.from('veiculos').upsert(veiculosParaImportar);
+                if (error) throw error;
+                mostrarMsg(`Sucesso! ${veiculosParaImportar.length} viaturas importadas.`);
+                document.getElementById('paste-area').value = ''; 
+                processarColagem(); 
+                carregarTudo();
+                mudarAba('frota', document.querySelectorAll('.menu-item')[1]);
+            } catch (err) {
+                mostrarMsg('Erro ao salvar lote: ' + err.message, 'erro');
+            }
+        }
+
         function preencherSelects() {
             const selSaida = document.getElementById('diario-saida-placa');
             if (selSaida) {
@@ -406,15 +472,13 @@
             });
         }
 
-        async function salvarChecklist() { /* Lógica resumida para poupar espaço, o restante funciona normalmente */ }
-        async function carregarChecklists() {} 
+        async function salvarChecklist() {}
+        async function carregarChecklists() {}
         async function salvarAbastecimento() {}
         async function carregarAbastecimentos() {}
         async function salvarManutencao() {}
         async function carregarManutencoes() {}
-        function processarColagem() {}
-        async function salvarLotePlanilha() {}
-        
+
         carregarTudo();
     </script>
 </body>
